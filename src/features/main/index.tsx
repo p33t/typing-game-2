@@ -1,13 +1,11 @@
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {ChangeEventHandler, KeyboardEventHandler} from "react";
-import {keyPressed} from "./slice";
+import {keyPressed, keySetChanged} from "./slice";
 import {Timestamper} from "../../common/timing";
-import {keySetChanged} from "../config/slice";
 import {KeySetName, KeySetNames} from "./model";
 
 export default function MainPage() {
 
-    const config = useAppSelector((state) => state.config);
     const main = useAppSelector((state) => state.main);
     const dispatch = useAppDispatch();
     const timestamper = Timestamper;
@@ -18,7 +16,6 @@ export default function MainPage() {
                 keyCode: evt.key,
                 keyedAt: timestamper()
             },
-            keySetName: config.keySetName,
         }));
     };
     
@@ -27,8 +24,8 @@ export default function MainPage() {
     };
 
     return (<div>
-        <p>Main Page: {config.keySetName}</p>
-        <select value={config.keySetName} onChange={onKeySetChange}>
+        <p>Main Page: {main.config.keySetName}</p>
+        <select value={main.config.keySetName} onChange={onKeySetChange}>
             {KeySetNames.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
         </select>
         <table>

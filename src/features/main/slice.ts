@@ -1,7 +1,6 @@
 import {KeyCapture, KeySetName} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {enumerateKeySet, nextKeyPrompt} from "../../common/key-key";
-import {keySetChanged} from "../config/slice";
 
 interface MainState {
     /** The history of keys pressed up to a maximum length */
@@ -15,24 +14,31 @@ interface MainState {
 
     /** Message shown to the user */
     message?: string,
+    
+    /** User editable configuration */
+    config: {
+        keySetName: KeySetName,
+    }
 }
-
 
 const initialState: MainState = {
     keyPrompt: [],
     keyHistory: [],
     buffer: [],
+    config: {
+        keySetName: "Home Keys",  
+    },
 }
 
 // TODO: Is there a better way to bootstrap the prompt array?
-manageKeys(initialState, "Home Keys");
+manageKeys(initialState);
 
 const mainSlice = createSlice({
     name: 'main',
     initialState,
     reducers: {
-        keyPressed(state, action: PayloadAction<{ keyCapture: KeyCapture, keySetName: KeySetName }>) {
-            const {keyCapture, keySetName} = action.payload;
+        keyPressed(state, action: PayloadAction<{ keyCapture: KeyCapture }>) {
+            const {keyCapture} = action.payload;
             if (state.keyPrompt.length === 0) {
                 throw new Error("No key prompt to compare");
             }
@@ -48,21 +54,20 @@ const mainSlice = createSlice({
                 state.keyHistory.push(consumed!);
                 state.keyPrompt.shift();
             }
-            manageKeys(state, keySetName);
+            manageKeys(state);
         },
         backspaced(state) {
             state.buffer.length = Math.max(state.buffer.length - 1, 0);
         },
-    },
-    extraReducers: (builder) => {
-        builder.addCase(keySetChanged, (state, action) => {
+        keySetChanged(state, action: PayloadAction<KeySetName>) {
+            state.config.keySetName = action.payload;
             state.keyPrompt.length = 0;
-            manageKeys(state, action.payload);
-        });
-    }
+            manageKeys(state);
+        },
+    },
 });
 
-function manageKeys(state: MainState, keySetName: KeySetName) {
+function manageKeys(state: MainState) {
     let historyLength = state.keyHistory.length;
     while (historyLength > 20) {
         state.keyHistory.shift();
@@ -70,7 +75,7 @@ function manageKeys(state: MainState, keySetName: KeySetName) {
     }
 
     let promptLength = state.keyPrompt.length;
-    const available = enumerateKeySet(keySetName);
+    const available = enumerateKeySet(state.config.keySetName);
     while (promptLength < 5) {
         let keyPrompt = nextKeyPrompt(available);
         state.keyPrompt.push(keyPrompt);
@@ -78,5 +83,5 @@ function manageKeys(state: MainState, keySetName: KeySetName) {
     }
 }
 
-export const {keyPressed, backspaced} = mainSlice.actions;
+export const {keyPressed, backspaced, keySetChanged} = mainSlice.actions;
 export default mainSlice.reducer;
