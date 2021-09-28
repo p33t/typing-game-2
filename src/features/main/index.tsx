@@ -3,6 +3,7 @@ import {ChangeEventHandler, KeyboardEventHandler} from "react";
 import {keyPressed, keySetChanged} from "./slice";
 import {Timestamper} from "../../common/timing";
 import {KeySetName, KeySetNames} from "./model";
+import KeyDefs from "./component/key-defs";
 
 export default function MainPage() {
 
@@ -13,7 +14,11 @@ export default function MainPage() {
     const onKeyPress: KeyboardEventHandler = (evt) => {
         dispatch(keyPressed({
             keyCapture: {
-                keyCode: evt.key,
+                keyDef: {
+                    char: evt.key,
+                    alt: false,
+                    ctrl: false,
+                },
                 keyedAt: timestamper()
             },
         }));
@@ -32,10 +37,10 @@ export default function MainPage() {
             <tbody>
             <tr>
                 <td>
-                    {main.keyHistory.map((kc, ix) => <span key={ix}>{kc.keyCode}</span>)}
+                    <KeyDefs keyDefs={main.keyHistory.map((kc) => kc.keyDef)}/>
                 </td>
                 <td>
-                    {main.keyPrompt.map((kp, ix) => <span key={ix}>{kp}</span>)}
+                    <KeyDefs keyDefs={main.keyPrompt}/>
                 </td>
             </tr>
             <tr>
@@ -43,7 +48,7 @@ export default function MainPage() {
                     -
                 </td>
                 <td>
-                    <input type='text' onKeyPress={onKeyPress} value={main.buffer.map((kc) => kc.keyCode).join()}/>
+                    <input type='text' onKeyPress={onKeyPress} value={main.buffer.map((kc) => kc.keyDef.char).join()}/>
                 </td>
             </tr>
             </tbody>

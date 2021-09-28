@@ -3,7 +3,13 @@ export type KeySetName = typeof KeySetNames[number];
 
 export type Timestamp = number;
 
+export type KeyDef = {
+    char: string,
+    ctrl: boolean,
+    alt: boolean,
+};
+
 export type KeyCapture = {
     keyedAt: Timestamp,
-    keyCode: string,
+    keyDef: KeyDef,
 }

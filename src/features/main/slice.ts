@@ -1,4 +1,4 @@
-import {KeyCapture, KeySetName} from "./model";
+import {KeyCapture, KeyDef, KeySetName} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {enumerateKeySet, nextKeyPrompt} from "../../common/key-key";
 
@@ -7,7 +7,7 @@ interface MainState {
     keyHistory: KeyCapture[],
 
     /** The next keys being shown to the user for echoing */
-    keyPrompt: string[],
+    keyPrompt: KeyDef[],
 
     /** Incorrect keystrokes entered by the user since the last correct keystroke */
     buffer: KeyCapture[],
@@ -47,7 +47,7 @@ const mainSlice = createSlice({
 
             const isMatch = () => state.buffer.length > 0
                 && state.keyPrompt.length > 0
-                && state.buffer[0].keyCode === state.keyPrompt[0];
+                && state.buffer[0].keyDef.char === state.keyPrompt[0].char; // TODO: Deep compare
 
             while (isMatch()) {
                 const consumed = state.buffer.shift();
@@ -77,8 +77,9 @@ function manageKeys(state: MainState) {
     let promptLength = state.keyPrompt.length;
     const available = enumerateKeySet(state.config.keySetName);
     while (promptLength < 5) {
-        let keyPrompt = nextKeyPrompt(available);
-        state.keyPrompt.push(keyPrompt);
+        const nextChar = nextKeyPrompt(available);
+        const nextDef: KeyDef = {char: nextChar, alt: false, ctrl: false};
+        state.keyPrompt.push(nextDef);
         promptLength++;
     }
 }

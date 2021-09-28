@@ -3,7 +3,7 @@ import {KeySetName} from "../features/main/model";
 export function enumerateKeySet(name: KeySetName): string[] {
     switch (name) {
         case "Home Keys":
-            return ['f', 'j' ,'d' ,'k' ,'s' ,'l' ,'a' ,';'];
+            return [' ', 'f', 'j' ,'d' ,'k' ,'s' ,'l' ,'a' ,';'];
             
         case "Home Row":
             const arr = enumerateKeySet("Home Keys");

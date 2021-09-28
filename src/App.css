@@ -40,3 +40,11 @@
 button {
   font-size: calc(10px + 2vmin);
 }
+
+.key-alt {
+  text-decoration: underline;
+}
+
+.key-ctrl {
+  font-weight: bold;
+}
