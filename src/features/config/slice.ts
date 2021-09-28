@@ -5,10 +5,6 @@ interface ConfigState {
     keySetName: KeySetName,
 }
 
-// const initialState: ConfigState = {
-//     keyCodes: ['f', 'j' ,'d' ,'k' ,'s' ,'l' ,'a' ,';'],
-// }
-
 const initialState: ConfigState = {
     keySetName: "Home Keys",
 }
