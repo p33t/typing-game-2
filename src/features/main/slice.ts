@@ -10,6 +10,9 @@ interface MainState {
     /** The next keys being shown to the user for echoing */
     keyPrompt: string[],
 
+    /** Incorrect keystrokes entered by the user since the last correct keystroke */
+    buffer: KeyCapture[],
+
     /** Message shown to the user */
     message?: string,
 }
@@ -18,6 +21,7 @@ interface MainState {
 const initialState: MainState = {
     keyPrompt: [],
     keyHistory: [],
+    buffer: [],
 }
 
 // TODO: Is there a better way to bootstrap the prompt array?
@@ -32,11 +36,22 @@ const mainSlice = createSlice({
             if (state.keyPrompt.length === 0) {
                 throw new Error("No key prompt to compare");
             }
-            if (keyCapture.keyCode === state.keyPrompt[0]) {
-                state.keyHistory.push(keyCapture);
+
+            state.buffer.push(keyCapture);
+
+            const isMatch = () => state.buffer.length > 0
+                && state.keyPrompt.length > 0
+                && state.buffer[0].keyCode === state.keyPrompt[0];
+
+            while (isMatch()) {
+                const consumed = state.buffer.shift();
+                state.keyHistory.push(consumed!);
                 state.keyPrompt.shift();
-                manageKeys(state, keySetName);
             }
+            manageKeys(state, keySetName);
+        },
+        backspaced(state) {
+            state.buffer.length = Math.max(state.buffer.length - 1, 0);
         },
     },
     extraReducers: (builder) => {
@@ -63,5 +78,5 @@ function manageKeys(state: MainState, keySetName: KeySetName) {
     }
 }
 
-export const {keyPressed} = mainSlice.actions;
+export const {keyPressed, backspaced} = mainSlice.actions;
 export default mainSlice.reducer;

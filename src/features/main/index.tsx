@@ -46,7 +46,7 @@ export default function MainPage() {
                     -
                 </td>
                 <td>
-                    <input type='text' onKeyPress={onKeyPress}/>
+                    <input type='text' onKeyPress={onKeyPress} value={main.buffer.map((kc) => kc.keyCode).join()}/>
                 </td>
             </tr>
             </tbody>
