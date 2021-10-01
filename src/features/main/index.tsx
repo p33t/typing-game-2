@@ -50,7 +50,7 @@ export default function MainPage() {
                 <td>
                     <CaptureKey
                         onCapture={onKeyCapture}
-                        value={main.buffer.map((kc) => kc.keyDef.char).join('')}/>
+                        value={main.buffer}/>
                 </td>
             </tr>
             </tbody>

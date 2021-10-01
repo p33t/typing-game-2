@@ -78,7 +78,7 @@ function manageKeys(state: MainState) {
     const available = enumerateKeySet(state.config.keySetName);
     while (promptLength < 5) {
         const nextChar = nextKeyPrompt(available);
-        const nextDef: KeyDef = {char: nextChar, alt: false, ctrl: false};
+        const nextDef: KeyDef = {char: nextChar, alt: false, ctrl: false, shift: false};
         state.keyPrompt.push(nextDef);
         promptLength++;
     }
