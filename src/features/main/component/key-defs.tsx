@@ -10,6 +10,7 @@ export default function KeyDefsComponent(props: KeyProps) {
         let className = '';
         if (keyDef.alt) className += ' key-alt';
         if (keyDef.ctrl) className += ' key-ctrl';
+        // TODO: Need to deal with 'shift'
         return className;
     }
     

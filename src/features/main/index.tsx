@@ -1,37 +1,23 @@
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {ChangeEventHandler, KeyboardEventHandler, useMemo} from "react";
+import {ChangeEventHandler, useMemo} from "react";
 import {backspaced, keyPressed, keySetChanged} from "./slice";
-import {Timestamper} from "../../common/timing";
-import {KeySetName, KeySetNames} from "./model";
+import {KeyCapture, KeySetName, KeySetNames} from "./model";
 import KeyDefs from "./component/key-defs";
+import CaptureKey from "./component/capture-key";
 
 export default function MainPage() {
 
     const main = useAppSelector((state) => state.main);
     const dispatch = useAppDispatch();
-    const timestamper = Timestamper;
 
-    const onKeyPress: KeyboardEventHandler = (evt) => {
-        dispatch(keyPressed({
-            keyCapture: {
-                keyDef: {
-                    char: evt.key,
-                    alt: evt.altKey,
-                    ctrl: evt.ctrlKey,
-                },
-                keyedAt: timestamper()
-            },
-        }));
-        evt.preventDefault();
-    };
-    
-    const onKeyDown: KeyboardEventHandler = (evt) => {
-        if (evt.key === 'Backspace') {
+    const onKeyCapture = (kc: KeyCapture) => {
+        if (kc.keyDef.char === 'Backspace') {
             dispatch(backspaced());
-            evt.preventDefault();
+        } else {
+            dispatch(keyPressed({keyCapture: kc}));
         }
     };
-    
+
     const onKeySetChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
         dispatch(keySetChanged(evt.target.value as KeySetName));
     };
@@ -39,19 +25,15 @@ export default function MainPage() {
     const history = useMemo(() => {
         const historyLength = main.keyHistory.length;
         const start = Math.max(0, historyLength - 6);
-        // let start = 0;
-        // if (historyLength > 5) {
-        //     start = historyLength - 6;
-        // }
         return main.keyHistory.slice(start).map((kc) => kc.keyDef)
     }, [main.keyHistory])
-    
+
     return (<div>
         <p>Main Page: {main.config.keySetName}</p>
         <select value={main.config.keySetName} onChange={onKeySetChange}>
             {KeySetNames.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
         </select>
-        <table>
+        <table className={'center'}>
             <tbody>
             <tr>
                 <td>
@@ -66,14 +48,9 @@ export default function MainPage() {
                     <KeyDefs keyDefs={history}/>
                 </td>
                 <td>
-                    {/* TODO: Not capturing ctrl+ key strokes */}
-                    <input
-                        type='text'
-                        readOnly
-                        onKeyPress={onKeyPress}
-                        onKeyDown={onKeyDown}
-                        value={main.buffer.map((kc) => kc.keyDef.char).join('')}
-                    />
+                    <CaptureKey
+                        onCapture={onKeyCapture}
+                        value={main.buffer.map((kc) => kc.keyDef.char).join('')}/>
                 </td>
             </tr>
             </tbody>
