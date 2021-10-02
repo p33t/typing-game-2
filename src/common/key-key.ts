@@ -28,13 +28,11 @@ const KEY_RATINGS: KeyRatings = {
 export type KeySetName = keyof KeyRatings;
 export const KeySetNames = Object.keys(KEY_RATINGS);
 
-type KeyRatingTypeMapper<Type> = {
-    [Property in keyof Type]: Map<string, number>;
-} 
+type KeyRatingMaps = {
+    [Property in keyof KeyRatings]: Map<string, number>;
+}
 
-type KeyRatingMaps = KeyRatingTypeMapper<KeyRatings>;
-
-function CalcKeyRatingMaps(obj: any): Map<string, number> {
+function calcKeyRatingMaps(obj: any): Map<string, number> {
     const tups = Object.keys(obj)
         .flatMap(prop =>
             prop.split('')
@@ -46,8 +44,8 @@ function CalcKeyRatingMaps(obj: any): Map<string, number> {
 }
 
 const KEY_RATING_MAP: KeyRatingMaps = {
-    "US Letters": CalcKeyRatingMaps(KEY_RATINGS["US Letters"]),
-    "US Letters, Symbols": CalcKeyRatingMaps(KEY_RATINGS["US Letters, Symbols"]),
+    "US Letters": calcKeyRatingMaps(KEY_RATINGS["US Letters"]),
+    "US Letters, Symbols": calcKeyRatingMaps(KEY_RATINGS["US Letters, Symbols"]),
 };
 
 export function enumerateKeySet(name: KeySetName): string[] {
