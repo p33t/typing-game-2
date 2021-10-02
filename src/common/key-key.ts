@@ -1,15 +1,61 @@
-import {KeySetName} from "../features/main/model";
+// TODO: +5 for shift key.  +6 for ctrl, +8 for alt?
+
+type KeyRatings = {
+    "US Letters": object,
+    "US Letters, Symbols": object
+};
+const KEY_RATINGS: KeyRatings = {
+    "US Letters":  {
+        ['asdfjkl']: 15 ,
+        ['weruio']: 23 ,
+        ['ghmcxnv']: 25 ,
+        ['zt']: 26 ,
+        ['bqpy']: 35 ,
+    },
+    "US Letters, Symbols": {
+        ['asdfjkl;']: 15,
+        ['weruio']: 23,
+        ['ghmc,xnv']: 25,
+        ['.z/t']: 26,
+        ['b\'qpy[']: 35,
+        [']\\']: 40,
+        ['2390']: 53,
+        ['4578-']: 55,
+        ['`=16']: 60,
+    },
+};
+
+export type KeySetName = keyof KeyRatings;
+export const KeySetNames = Object.keys(KEY_RATINGS);
+
+type KeyRatingTypeMapper<Type> = {
+    [Property in keyof Type]: Map<string, number>;
+} 
+
+type KeyRatingMaps = KeyRatingTypeMapper<KeyRatings>;
+
+function CalcKeyRatingMaps(obj: any): Map<string, number> {
+    const tups = Object.keys(obj)
+        .flatMap(prop =>
+            prop.split('')
+            .map(ch => {
+                const tup: [string, number] = [ch, obj[prop]];
+                return tup;
+            }));
+    return new Map(tups);
+}
+
+const KEY_RATING_MAP: KeyRatingMaps = {
+    "US Letters": CalcKeyRatingMaps(KEY_RATINGS["US Letters"]),
+    "US Letters, Symbols": CalcKeyRatingMaps(KEY_RATINGS["US Letters, Symbols"]),
+};
 
 export function enumerateKeySet(name: KeySetName): string[] {
-    switch (name) {
-        case "Home Keys":
-            return ['f', 'j', 'd', 'k', 's', 'l', 'a', ';'];
+    return Array.from(KEY_RATING_MAP[name].keys());
+}
 
-        case "Home Row":
-            const arr = enumerateKeySet("Home Keys");
-            arr.push('g', 'h', "'");
-            return arr;
-    }
+export function keyRating(name: KeySetName, ch: string) {
+   return KEY_RATING_MAP[name].get(ch)!;
 }
 
 export function defaultShiftCharFor(rawChar: string) {

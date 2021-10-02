@@ -1,9 +1,10 @@
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {ChangeEventHandler, useMemo} from "react";
 import {backspaced, keyPressed, keySetChanged} from "./slice";
-import {KeyCapture, KeySetName, KeySetNames} from "./model";
+import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
+import {KeySetName, KeySetNames} from "../../common/key-key";
 
 export default function MainPage() {
 
