@@ -1,6 +1,6 @@
-import {KeyCapture, KeyDef, KeySetName} from "./model";
+import {KeyCapture, KeyDef} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {enumerateKeySet, nextKeyPrompt} from "../../common/key-key";
+import {enumerateKeySet, KeySetName, nextKeyPrompt} from "../../common/key-key";
 
 interface MainState {
     /** The history of keys pressed up to a maximum length */
@@ -26,7 +26,7 @@ const initialState: MainState = {
     keyHistory: [],
     buffer: [],
     config: {
-        keySetName: "Home Keys",  
+        keySetName: "US Letters",  
     },
 }
 
