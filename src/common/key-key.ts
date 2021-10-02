@@ -1,61 +1,61 @@
 // TODO: +5 for shift key.  +6 for ctrl, +8 for alt?
 
-type KeyRatings = {
-    "US Letters": object,
-    "US Letters, Symbols": object
-};
-const KEY_RATINGS: KeyRatings = {
-    "US Letters":  {
-        ['asdfjkl']: 15 ,
-        ['weruio']: 23 ,
-        ['ghmcxnv']: 25 ,
-        ['zt']: 26 ,
-        ['bqpy']: 35 ,
-    },
-    "US Letters, Symbols": {
-        ['asdfjkl;']: 15,
-        ['weruio']: 23,
-        ['ghmc,xnv']: 25,
-        ['.z/t']: 26,
-        ['b\'qpy[']: 35,
-        [']\\']: 40,
-        ['2390']: 53,
-        ['4578-']: 55,
-        ['`=16']: 60,
-    },
-};
+export const KEY_SET_NAMES = ['US Letters', 'US Letters, Symbols'] as const;
+export type KeySetName = typeof KEY_SET_NAMES[number];
 
-export type KeySetName = keyof KeyRatings;
-export const KeySetNames = Object.keys(KEY_RATINGS);
+export type KeySet = ReadonlyMap<string, number>;
 
-type KeyRatingMaps = {
-    [Property in keyof KeyRatings]: Map<string, number>;
-}
-
-function calcKeyRatingMaps(obj: any): Map<string, number> {
+function calcKeyDifficulties(obj: any): Map<string, number> {
     const tups = Object.keys(obj)
         .flatMap(prop =>
             prop.split('')
-            .map(ch => {
-                const tup: [string, number] = [ch, obj[prop]];
-                return tup;
-            }));
+                .map(ch => {
+                    const tup: [string, number] = [ch, obj[prop]];
+                    return tup;
+                }));
     return new Map(tups);
 }
 
-const KEY_RATING_MAP: KeyRatingMaps = {
-    "US Letters": calcKeyRatingMaps(KEY_RATINGS["US Letters"]),
-    "US Letters, Symbols": calcKeyRatingMaps(KEY_RATINGS["US Letters, Symbols"]),
-};
+function calcKeySet(name: KeySetName, difficultiesObj: any): [KeySetName, KeySet] {
+    const difficulties = calcKeyDifficulties(difficultiesObj);
+    return [name, difficulties];
+}
 
-export function enumerateKeySet(name: KeySetName): string[] {
-    return Array.from(KEY_RATING_MAP[name].keys());
+const KEY_SETS: Map<KeySetName, KeySet> = new Map<KeySetName, KeySet>(
+    [
+        calcKeySet('US Letters', {
+            ['asdfjkl']: 15,
+            ['weruio']: 23,
+            ['ghmcxnv']: 25,
+            ['zt']: 26,
+            ['bqpy']: 35,
+        }),
+        calcKeySet('US Letters, Symbols', {
+            ['asdfjkl;']: 15,
+            ['weruio']: 23,
+            ['ghmc,xnv']: 25,
+            ['.z/t']: 26,
+            ['b\'qpy[']: 35,
+            [']\\']: 40,
+            ['2390']: 53,
+            ['4578-']: 55,
+            ['`=16']: 60,
+        }),
+    ]
+);
+
+export function listKeys(name: KeySetName): string[] {
+    return Array.from(KEY_SETS.get(name)!.keys());
 }
 
 export function keyRating(name: KeySetName, ch: string) {
-   return KEY_RATING_MAP[name].get(ch)!;
+   return KEY_SETS.get(name)!.get(ch)!;
 }
 
+export function keySet(name: KeySetName): KeySet {
+    return KEY_SETS.get(name)!;
+}
+ 
 export function defaultShiftCharFor(rawChar: string) {
     switch (rawChar) {
         case '`':
