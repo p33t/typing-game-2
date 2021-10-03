@@ -1,4 +1,5 @@
-import {defaultShiftCharFor, listKeys, keyRating} from './key-key';
+import {defaultShiftCharFor, listKeys, keyRating, listKeyDefs} from './key-key';
+import {PERFECT, permittedKeys} from "../features/main/assessment";
 
 const isUnique = (arr: string[]) => new Set(arr).size === arr.length;
 
@@ -30,4 +31,33 @@ test('default shift char for', () => {
     });
 
     expect(isUnique(shifted)).toBe(true);
+});
+
+
+test('listKeyDefs() all keys', () => {
+    const actual = listKeyDefs('US Home Keys', true,  true, true);
+    expect(actual.length).toBe(8 * 2 * 2 * 2);
+
+    const actual0 = actual[0];
+    expect(actual0.char).toBe('j');
+    expect(actual0.shift).toBe(false);
+    expect(actual0.control).toBe(false);
+    expect(actual0.alt).toBe(false);
+
+    const actualN = actual[actual.length - 1];
+    expect(actualN.char).toBe('a');
+    expect(actualN.shift).toBe(true);
+    expect(actualN.control).toBe(true);
+    expect(actualN.alt).toBe(true);
+});
+
+test('listKeyDefs() shift-only keys', () => {
+    const actual = listKeyDefs('US Home Keys', true, false, false);
+    expect(actual.length).toBe(16);
+
+    const actualN = actual[actual.length - 1];
+    expect(actualN.char).toBe('a');
+    expect(actualN.shift).toBe(true);
+    expect(actualN.control).toBe(false);
+    expect(actualN.alt).toBe(false);
 });

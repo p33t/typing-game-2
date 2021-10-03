@@ -1,7 +1,4 @@
-export const KEY_SET_NAMES = ['US Home Keys', 'US Letters', 'US Letters, Symbols'] as const;
-export type KeySetName = typeof KEY_SET_NAMES[number];
-
-export type KeySet = ReadonlyMap<string, number>;
+import {KeyDef, KeySet, KeySetName} from "./key-model";
 
 function calcKeyDifficulties(obj: any): Map<string, number> {
     const tups = Object.keys(obj)
@@ -46,7 +43,7 @@ const KEY_SETS: Map<KeySetName, KeySet> = new Map<KeySetName, KeySet>(
     ]
 );
 
-export const DIFFICULTY_BOOST = {
+const DIFFICULTY_BOOST = {
     shift: 5,
     control: 6,
     alt: 8,
@@ -64,6 +61,44 @@ export function keySet(name: KeySetName): KeySet {
     return KEY_SETS.get(name)!;
 }
  
+export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, controlEnabled: boolean, altEnabled: boolean) {
+    // explode into variations based on configuration
+    const templates = [{
+        char: '',
+        alt: false,
+        control: false,
+        shift: false,
+        difficulty: 0,
+    } as KeyDef];
+    if (shiftEnabled) {
+        templates.push(...templates.map(t =>
+            ({...t, shift: true, difficulty: t.difficulty + DIFFICULTY_BOOST.shift}) as KeyDef));
+    }
+
+    if (controlEnabled) {
+        templates.push(...templates.map(t =>
+            ({...t, control: true, difficulty: t.difficulty + DIFFICULTY_BOOST.control}) as KeyDef));
+    }
+
+    if (altEnabled) {
+        templates.push(...templates.map(t =>
+            ({...t, alt: true, difficulty: t.difficulty + DIFFICULTY_BOOST.alt}) as KeyDef));
+    }
+
+    let result: KeyDef[] = [];
+    for (const [key, difficulty] of keySet(keySetName).entries()) {
+        result.push(...templates.map(t => ({...t, char: key, difficulty: t.difficulty + difficulty})));
+    }
+
+    // sort by difficulty and keep in original declared order if same difficulty
+    result.sort((l,r) => l.difficulty === r.difficulty
+        ? 0
+        : l.difficulty > r.difficulty
+            ? 1
+            : -1);
+    return result;
+}
+
 export function defaultShiftCharFor(rawChar: string) {
     switch (rawChar) {
         case '`':

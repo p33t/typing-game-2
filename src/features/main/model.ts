@@ -1,21 +1,14 @@
-import {KeySetName} from "../../common/key-key";
+import {KeyDef, KeySetName} from "../../common/key-model";
 
 export type Timestamp = number;
-
-export type KeyDef = {
-    char: string,
-    control: boolean,
-    alt: boolean,
-    shift: boolean,
-};
 
 export type KeyCapture = {
     keyedAt: Timestamp,
     keyDef: KeyDef,
 }
 
-export type Score = number;
 export type Percent = number;
+export type Score = number;
 
 export type Assessment = {
     difficulty: Score,

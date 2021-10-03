@@ -1,5 +1,5 @@
-import {AppConfig, KeyDef, Percent} from "./model";
-import {DIFFICULTY_BOOST, keySet} from "../../common/key-key";
+import {Percent} from "./model";
+import {KeyDef} from "../../common/key-model";
 
 export const PERFECT: Percent = 100;
 // export const AssessmentConst = {
@@ -24,50 +24,15 @@ export const PERFECT: Percent = 100;
 //     HIGH_PROBABILITY: 20,
 // };
 
-interface KeyDefPlus extends KeyDef {
-    difficulty: number,
-}
-
-// export function generateKey(config: AppConfig, difficulty: Percent, recentKeys: string[], random?: number): KeyDef {
-export function permittedKeys(config: AppConfig, difficulty: Percent): KeyDef[] {
-    // explode into variations based on configuration
-    const templates = [{
-        char: '',
-        alt: false,
-        control: false,
-        shift: false,
-        difficulty: 0,
-    }];
-    if (config.shiftEnabled) {
-        templates.push(...templates.map(t =>
-            ({...t, shift: true, difficulty: t.difficulty + DIFFICULTY_BOOST.shift}) as KeyDefPlus));
-    }
+export function permittedKeys(availableSorted: KeyDef[], difficulty: Percent): KeyDef[] {
     
-    if (config.controlEnabled) {
-        templates.push(...templates.map(t =>
-            ({...t, control: true, difficulty: t.difficulty + DIFFICULTY_BOOST.control}) as KeyDefPlus));
-    }
-    
-    if (config.altEnabled) {
-        templates.push(...templates.map(t =>
-            ({...t, alt: true, difficulty: t.difficulty + DIFFICULTY_BOOST.alt}) as KeyDefPlus));
-    }
-
-    let result: KeyDefPlus[] = [];
-    for (const [key, difficulty] of keySet(config.keySetName).entries()) {
-        result.push(...templates.map(t => ({...t, char: key, difficulty: t.difficulty + difficulty})));
-    }
-    
-    // keep portion that is within difficulty range
-    result.sort((l,r) => l.difficulty === r.difficulty
-        ? 0
-        : l.difficulty > r.difficulty
-            ? 1
-            : -1);
-    let ixEnd = Math.round((result.length * difficulty / PERFECT));
+    let ixEnd = Math.round((availableSorted.length * difficulty / PERFECT));
     if (ixEnd === 0) ixEnd++; // bottom out with a single element
-    if (ixEnd < result.length) result = result.slice(0, ixEnd);
+    if (ixEnd < availableSorted.length) return availableSorted.slice(0, ixEnd);
     
-    return result;
+    return availableSorted;
 }
 
+// export function evaluate(config: AppConfig, history: KeyCapture[]): Assessment {
+//    
+// }
