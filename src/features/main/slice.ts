@@ -1,6 +1,6 @@
-import {KeyCapture, KeyDef} from "./model";
+import {AppConfig, Assessment, KeyCapture, KeyDef} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {enumerateKeySet, KeySetName, nextKeyPrompt} from "../../common/key-key";
+import {listKeys, KeySetName, nextKeyPrompt} from "../../common/key-key";
 
 interface MainState {
     /** The history of keys pressed up to a maximum length */
@@ -12,13 +12,14 @@ interface MainState {
     /** Incorrect keystrokes entered by the user since the last correct keystroke */
     buffer: KeyCapture[],
 
+    /** The current assessment result for user to observe */
+    assessment?: Assessment,
+
     /** Message shown to the user */
     message?: string,
     
     /** User editable configuration */
-    config: {
-        keySetName: KeySetName,
-    }
+    config: AppConfig,
 }
 
 const initialState: MainState = {
@@ -27,6 +28,10 @@ const initialState: MainState = {
     buffer: [],
     config: {
         keySetName: "US Letters",  
+        shiftEnabled: true,
+        controlEnabled: false,
+        altEnabled: false,
+        autoAdjustDifficulty: true,
     },
 }
 
@@ -75,13 +80,19 @@ function manageKeys(state: MainState) {
     }
 
     let promptLength = state.keyPrompt.length;
-    const available = enumerateKeySet(state.config.keySetName);
+    const available = listKeys(state.config.keySetName);
     while (promptLength < 5) {
         const nextChar = nextKeyPrompt(available);
-        const nextDef: KeyDef = {char: nextChar, alt: false, ctrl: false, shift: false};
+        const nextDef: KeyDef = {char: nextChar, alt: false, control: false, shift: false};
         state.keyPrompt.push(nextDef);
         promptLength++;
     }
+//    
+//     const assessment = assess(state.keyHistory);
+// }
+//
+// function assess(keyHistory: KeyCapture[]) {
+//    
 }
 
 export const {keyPressed, backspaced, keySetChanged} = mainSlice.actions;

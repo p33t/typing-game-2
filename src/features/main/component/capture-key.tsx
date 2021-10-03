@@ -30,7 +30,7 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
                     keyDef: {
                         char: evt.key,
                         alt: evt.altKey,
-                        ctrl: evt.ctrlKey,
+                        control: evt.ctrlKey,
                         shift: evt.shiftKey,
                     },
                     keyedAt: timestamper()

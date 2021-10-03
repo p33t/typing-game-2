@@ -1,6 +1,4 @@
-// TODO: +5 for shift key.  +6 for ctrl, +8 for alt?
-
-export const KEY_SET_NAMES = ['US Letters', 'US Letters, Symbols'] as const;
+export const KEY_SET_NAMES = ['US Home Keys', 'US Letters', 'US Letters, Symbols'] as const;
 export type KeySetName = typeof KEY_SET_NAMES[number];
 
 export type KeySet = ReadonlyMap<string, number>;
@@ -23,6 +21,10 @@ function calcKeySet(name: KeySetName, difficultiesObj: any): [KeySetName, KeySet
 
 const KEY_SETS: Map<KeySetName, KeySet> = new Map<KeySetName, KeySet>(
     [
+        calcKeySet('US Home Keys', {
+            ['jfkd']: 15,
+            ['ls;a']: 18,
+        }),
         calcKeySet('US Letters', {
             ['asdfjkl']: 15,
             ['weruio']: 23,
@@ -43,6 +45,12 @@ const KEY_SETS: Map<KeySetName, KeySet> = new Map<KeySetName, KeySet>(
         }),
     ]
 );
+
+export const DIFFICULTY_BOOST = {
+    shift: 5,
+    control: 6,
+    alt: 8,
+};
 
 export function listKeys(name: KeySetName): string[] {
     return Array.from(KEY_SETS.get(name)!.keys());
