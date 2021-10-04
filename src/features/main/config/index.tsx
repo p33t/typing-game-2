@@ -33,12 +33,10 @@ export default function MainConfigComponent() {
             {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
         </select>
         &nbsp;
+        {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
         <label>Modifier Keys: </label>
         <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/> 
         <label>Shift</label>
-        &nbsp;
-        <input type="checkbox" value="controlEnabled" onChange={onToggleModifier} checked={config.controlEnabled}/> 
-        <label>Control</label>
         &nbsp;
         <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/> 
         <label>Alt</label>
