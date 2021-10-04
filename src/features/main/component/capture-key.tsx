@@ -1,5 +1,5 @@
 import {KeyCapture} from "../model";
-import {KeyboardEventHandler, useCallback, useMemo} from "react";
+import { useCallback, useEffect, useMemo, useRef} from "react";
 import {Timestamper} from "../../../common/timing";
 import {defaultRawCharFor, defaultShiftCharFor} from "../../../common/key-key";
 
@@ -40,5 +40,19 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
         evt.preventDefault();
     }, []);
 
-    return (<input type='text' onKeyDown={onKeyDown} defaultValue={defaultValue}/>);
+    // Use low-level event handler setup to get at listening options
+    const inputRef = useRef<HTMLInputElement>();
+    useEffect(() => {
+        // NOTE: Need passive:false to make evt.preventDefault() work in Chrome
+        //       See https://youtu.be/DJYpXxWqvmo?t=152
+        inputRef.current?.addEventListener('keydown', onKeyDown, { passive: false });
+        // "capture: true" seems to double up the keystrokes and doesn't help with system shortcut capturing
+        return () => {
+            inputRef.current?.removeEventListener('keydown', onKeyDown)
+        }
+    }, [inputRef])
+    
+    return (<input type='text'
+                   ref={(ref) => inputRef.current = ref ?? undefined}
+                   defaultValue={defaultValue}/>);
 }
