@@ -25,9 +25,9 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
     
     const onKeyDown = useCallback((evt: KeyboardEvent) => {
         const normKey = evt.key.trim().toLowerCase();
-        if (normKey === 'tab') return;
         
         if (normKey === 'backspace' || normKey.length === 1) {
+            evt.preventDefault();
             const char = evt.shiftKey ? defaultRawCharFor(evt.key) : evt.key;
             props.onCapture(
                 {
@@ -40,7 +40,6 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
                 },
             );
         }
-        evt.preventDefault();
     }, []);
 
     // Use low-level event handler setup to get at listening options
