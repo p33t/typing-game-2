@@ -78,8 +78,8 @@ const mainSlice = createSlice({
         backspaced(state) {
             state.buffer.length = Math.max(state.buffer.length - 1, 0);
         },
-        keySetChanged(state, action: PayloadAction<KeySetName>) {
-            state.config.keySetName = action.payload;
+        configChanged(state, action: PayloadAction<AppConfig>) {
+            state.config = action.payload;
             manageKeys(state);
         },
     },
@@ -126,5 +126,5 @@ function manageKeys(state: MainState) {
 //    
 }
 
-export const {keyPressed, backspaced, keySetChanged} = mainSlice.actions;
+export const {keyPressed, backspaced, configChanged} = mainSlice.actions;
 export default mainSlice.reducer;

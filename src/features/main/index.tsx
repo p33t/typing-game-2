@@ -1,10 +1,10 @@
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {ChangeEventHandler, useMemo} from "react";
-import {backspaced, keyPressed, keySetChanged} from "./slice";
+import {backspaced, keyPressed} from "./slice";
 import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
-import {KeySetName, KEY_SET_NAMES} from "../../common/key-model";
+import MainConfig from './config/index';
+import {useMemo} from "react";
 
 export default function MainPage() {
 
@@ -19,10 +19,6 @@ export default function MainPage() {
         }
     };
 
-    const onKeySetChange: ChangeEventHandler<HTMLSelectElement> = (evt) => {
-        dispatch(keySetChanged(evt.target.value as KeySetName));
-    };
-
     const history = useMemo(() => {
         const historyLength = main.keyHistory.length;
         const start = Math.max(0, historyLength - 6);
@@ -31,9 +27,7 @@ export default function MainPage() {
 
     return (<div>
         <p>Main Page: {main.config.keySetName}</p>
-        <select value={main.config.keySetName} onChange={onKeySetChange}>
-            {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
-        </select>
+        <MainConfig/>
         <table className={'center'}>
             <tbody>
             <tr>
