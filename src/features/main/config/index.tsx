@@ -15,8 +15,32 @@ export default function MainConfigComponent() {
             keySetName,
         } as AppConfig;
         dispatch(configChanged(newConfig));
-    }, []);
-    return (<select value={config.keySetName} onChange={onKeySetChange}>
-        {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
-    </select>);
+    }, [config]);
+    
+    const onToggleModifier: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
+        const enabled = evt.target.checked;
+        const propName = evt.target.value;
+        const newConfig = {
+            ...config,
+            [propName]: enabled,
+        } as AppConfig;
+        dispatch(configChanged(newConfig));
+    }, [config]);
+    
+    return (<>
+        <label>Key Set: </label>
+        <select value={config.keySetName} onChange={onKeySetChange}>
+            {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
+        </select>
+        &nbsp;
+        <label>Modifier Keys: </label>
+        <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/> 
+        <label>Shift</label>
+        &nbsp;
+        <input type="checkbox" value="controlEnabled" onChange={onToggleModifier} checked={config.controlEnabled}/> 
+        <label>Control</label>
+        &nbsp;
+        <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/> 
+        <label>Alt</label>
+    </>);
 }
