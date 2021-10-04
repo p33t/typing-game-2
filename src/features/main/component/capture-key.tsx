@@ -23,8 +23,11 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
            .join('') 
     }, [props.value]);
     
-    const onKeyDown: KeyboardEventHandler = useCallback((evt) => {
-        if (evt.key === 'Backspace' || evt.key === 'BACKSPACE' || evt.key.trim().length === 1) {
+    const onKeyDown = useCallback((evt: KeyboardEvent) => {
+        const normKey = evt.key.trim().toLowerCase();
+        if (normKey === 'tab') return;
+        
+        if (normKey === 'backspace' || normKey.length === 1) {
             const char = evt.shiftKey ? defaultRawCharFor(evt.key) : evt.key;
             props.onCapture(
                 {
