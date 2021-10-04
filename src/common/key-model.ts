@@ -4,10 +4,10 @@ export type KeySetName = typeof KEY_SET_NAMES[number];
 
 export type KeySet = ReadonlyMap<string, number>;
 
-export type KeyDef = {
+export interface KeyDef {
     char: string,
     control: boolean,
     alt: boolean,
     shift: boolean,
     difficulty: number,
-};
+}

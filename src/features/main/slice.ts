@@ -1,14 +1,15 @@
-import {AppConfig, Assessment, KeyCapture, KeyDef} from "./model";
+import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {listKeys, KeySetName, nextKeyPrompt} from "../../common/key-key";
+import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
+import {KeyDef, KeySetName} from "../../common/key-model";
 
 interface MainState {
-    /** The history of keys pressed up to a maximum length */
-    keyHistory: KeyCapture[],
-
     /** The next keys being shown to the user for echoing */
     keyPrompt: KeyDef[],
-
+    
+    /** The history of keys pressed up to a maximum length */
+    keyHistory: KeyEvent[],
+    
     /** Incorrect keystrokes entered by the user since the last correct keystroke */
     buffer: KeyCapture[],
 
@@ -20,6 +21,9 @@ interface MainState {
     
     /** User editable configuration */
     config: AppConfig,
+    
+    /** Saves values that are a little expensive to compute every keystroke */
+    cache?: AppCache,
 }
 
 const initialState: MainState = {
@@ -50,14 +54,24 @@ const mainSlice = createSlice({
 
             state.buffer.push(keyCapture);
 
-            const isMatch = () => state.buffer.length > 0
-                && state.keyPrompt.length > 0
-                && state.buffer[0].keyDef.char === state.keyPrompt[0].char; // TODO: Deep compare
-
+            const isMatch = () => {
+                if (state.buffer.length === 0) return false;
+                if (state.keyPrompt.length === 0) return false;
+                const buffer0 = state.buffer[0];
+                const prompt0 = state.keyPrompt[0];
+                return buffer0.char === prompt0.char
+                    && buffer0.shift === prompt0.shift
+                    && buffer0.control === prompt0.control
+                    && buffer0.alt === prompt0.alt;
+            }
+    
             while (isMatch()) {
                 const consumed = state.buffer.shift();
-                state.keyHistory.push(consumed!);
-                state.keyPrompt.shift();
+                const prompt = state.keyPrompt.shift();
+                state.keyHistory.push({
+                    ...consumed!,
+                    prompt: (prompt as KeyDef)
+                });
             }
             manageKeys(state);
         },
@@ -66,7 +80,6 @@ const mainSlice = createSlice({
         },
         keySetChanged(state, action: PayloadAction<KeySetName>) {
             state.config.keySetName = action.payload;
-            state.keyPrompt.length = 0;
             manageKeys(state);
         },
     },
@@ -79,13 +92,31 @@ function manageKeys(state: MainState) {
         historyLength--;
     }
 
-    let promptLength = state.keyPrompt.length;
-    const available = listKeys(state.config.keySetName);
-    while (promptLength < 5) {
-        const nextChar = nextKeyPrompt(available);
-        const nextDef: KeyDef = {char: nextChar, alt: false, control: false, shift: false};
-        state.keyPrompt.push(nextDef);
-        promptLength++;
+    // config elements that will void the cache 
+    const configHash = JSON.stringify([
+        state.config.keySetName,
+        state.config.shiftEnabled,
+        state.config.controlEnabled,
+        state.config.altEnabled,
+    ]);
+    if (state.cache?.configHash !== configHash) {
+        state.cache = {
+            configHash,
+            availableKeys: listKeyDefs(
+                state.config.keySetName,
+                state.config.shiftEnabled,
+                state.config.controlEnabled,
+                state.config.controlEnabled)
+        };
+        state.keyPrompt.length = 0;
+        state.keyHistory.length = 0;
+    }
+
+    // TODO: Will use target difficulty to truncate this array
+    const available = state.cache!.availableKeys;
+    while (state.keyPrompt.length < 5) {
+        const next = nextKeyPrompt(available, state.keyPrompt);
+        state.keyPrompt.push(next);
     }
 //    
 //     const assessment = assess(state.keyHistory);

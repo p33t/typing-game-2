@@ -54,13 +54,13 @@ export function listKeys(name: KeySetName): string[] {
 }
 
 export function keyRating(name: KeySetName, ch: string) {
-   return KEY_SETS.get(name)!.get(ch)!;
+    return KEY_SETS.get(name)!.get(ch)!;
 }
 
 export function keySet(name: KeySetName): KeySet {
     return KEY_SETS.get(name)!;
 }
- 
+
 export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, controlEnabled: boolean, altEnabled: boolean) {
     // explode into variations based on configuration
     const templates = [{
@@ -91,7 +91,7 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
     }
 
     // sort by difficulty and keep in original declared order if same difficulty
-    result.sort((l,r) => l.difficulty === r.difficulty
+    result.sort((l, r) => l.difficulty === r.difficulty
         ? 0
         : l.difficulty > r.difficulty
             ? 1
@@ -99,57 +99,56 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
     return result;
 }
 
+const US_SHIFT_CHAR_MAP: [string, string][] = [
+    ['`', '~'],
+    ['1', '!'],
+    ['2', '@'],
+    ['3', '#'],
+    ['4', '$'],
+    ['5', '%'],
+    ['6', '^'],
+    ['7', '&'],
+    ['8', '*'],
+    ['9', '('],
+    ['0', ')'],
+    ['-', '_'],
+    ['=', '+'],
+    ['[', '{'],
+    [']', '}'],
+    ['\\', '|'],
+    [';', ':'],
+    ['\'', '"'],
+    [',', '<'],
+    ['.', '>'],
+    ['/', '?'],
+    ['Backspace', 'BACKSPACE'],
+];
+
 export function defaultShiftCharFor(rawChar: string) {
-    switch (rawChar) {
-        case '`':
-            return '~';
-        case '1':
-            return '!';
-        case '2':
-            return '@';
-        case '3':
-            return '#';
-        case '4':
-            return '$';
-        case '5':
-            return '%';
-        case '6':
-            return '^';
-        case '7':
-            return '&';
-        case '8':
-            return '*';
-        case '9':
-            return '(';
-        case '0':
-            return ')';
-        case '-':
-            return '_';
-        case '=':
-            return '+';
-        case '[':
-            return '{';
-        case ']':
-            return '}';
-        case '\\':
-            return '|';
-        case ';':
-            return ':';
-        case '\'':
-            return '"';
-        case ',':
-            return '<';
-        case '.':
-            return '>';
-        case '/':
-            return '?';
-        default:
-            return rawChar.toUpperCase();
+    for (const [raw, shifted] of US_SHIFT_CHAR_MAP) {
+        if (rawChar === raw) return shifted;
     }
+    return rawChar.toUpperCase();
 }
 
-export function nextKeyPrompt(available: string[]) {
-    // TODO: This needs to get more elaborate and incorporate a probability profile
-    const ix = Math.floor(Math.random() * available.length);
-    return available[ix];
+export function defaultRawCharFor(shiftedChar: string) {
+    for (const [raw, shifted] of US_SHIFT_CHAR_MAP) {
+        if (shiftedChar === shifted) return raw;
+    }
+    return shiftedChar.toLowerCase();
+}
+
+/** Randomly selects a key from those available while avoiding the given recent keys */
+export function nextKeyPrompt(available: KeyDef[], recent: KeyDef[]): KeyDef {
+    let attempts = 0;
+    let candidate: KeyDef | undefined;
+    while (attempts < 4) {
+        attempts++;
+        const ix = Math.floor(Math.random() * available.length);
+        candidate = available[ix];
+        if (recent.find(kd => kd.char === candidate!.char) === undefined) {
+            return candidate;
+        }
+    }
+    return candidate!;
 }

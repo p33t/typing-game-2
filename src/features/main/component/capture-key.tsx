@@ -1,7 +1,7 @@
 import {KeyCapture} from "../model";
 import {KeyboardEventHandler, useMemo} from "react";
 import {Timestamper} from "../../../common/timing";
-import {defaultShiftCharFor} from "../../../common/key-key";
+import {defaultRawCharFor, defaultShiftCharFor} from "../../../common/key-key";
 
 interface CaptureKeyProps {
     value: KeyCapture[],
@@ -13,8 +13,8 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
 
     const defaultValue = useMemo(() => {
        return props.value.map((kc) => {
-           let char = kc.keyDef.char;
-           if (kc.keyDef.shift) {
+           let char = kc.char;
+           if (kc.shift) {
                // FUTURE: Will allow user to customize for non-US keyboards
                char = defaultShiftCharFor(char);
            }
@@ -24,16 +24,16 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
     }, [props.value]);
     
     const onKeyDown: KeyboardEventHandler = (evt) => {
-        if (evt.key === 'Backspace' || evt.key.trim().length === 1) {
+        if (evt.key === 'Backspace' || evt.key === 'BACKSPACE' || evt.key.trim().length === 1) {
+            const char = evt.shiftKey ? defaultRawCharFor(evt.key) : evt.key;
             props.onCapture(
                 {
-                    keyDef: {
-                        char: evt.key,
-                        alt: evt.altKey,
-                        control: evt.ctrlKey,
-                        shift: evt.shiftKey,
-                    },
-                    keyedAt: timestamper()
+                    char,
+                    alt: evt.altKey,
+                    control: evt.ctrlKey,
+                    shift: evt.shiftKey,
+                    keyedAt: timestamper(),
+                    difficulty: 0, // TODO: This is smelly
                 },
             );
         }

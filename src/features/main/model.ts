@@ -2,9 +2,12 @@ import {KeyDef, KeySetName} from "../../common/key-model";
 
 export type Timestamp = number;
 
-export type KeyCapture = {
+export interface KeyCapture extends KeyDef {
     keyedAt: Timestamp,
-    keyDef: KeyDef,
+}
+
+export interface KeyEvent extends KeyCapture {
+    prompt: KeyDef,
 }
 
 export type Percent = number;
@@ -26,3 +29,8 @@ export type AppConfig = {
     controlEnabled: boolean;
     autoAdjustDifficulty: boolean;
 };
+
+export type AppCache = {
+    configHash: string;
+    availableKeys: KeyDef[];
+}

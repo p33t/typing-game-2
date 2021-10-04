@@ -4,7 +4,7 @@ import {backspaced, keyPressed, keySetChanged} from "./slice";
 import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
-import {KeySetName, KeySetNames} from "../../common/key-key";
+import {KeySetName, KEY_SET_NAMES} from "../../common/key-model";
 
 export default function MainPage() {
 
@@ -12,7 +12,7 @@ export default function MainPage() {
     const dispatch = useAppDispatch();
 
     const onKeyCapture = (kc: KeyCapture) => {
-        if (kc.keyDef.char === 'Backspace') {
+        if (kc.char.toLowerCase() === 'backspace') { // TODO: toLowerCase() shouldn't be necessary. 'Backspace' instead
             dispatch(backspaced());
         } else {
             dispatch(keyPressed({keyCapture: kc}));
@@ -26,19 +26,19 @@ export default function MainPage() {
     const history = useMemo(() => {
         const historyLength = main.keyHistory.length;
         const start = Math.max(0, historyLength - 6);
-        return main.keyHistory.slice(start).map((kc) => kc.keyDef)
+        return main.keyHistory.slice(start)
     }, [main.keyHistory])
 
     return (<div>
         <p>Main Page: {main.config.keySetName}</p>
         <select value={main.config.keySetName} onChange={onKeySetChange}>
-            {KeySetNames.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
+            {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
         </select>
         <table className={'center'}>
             <tbody>
             <tr>
                 <td>
-                    <KeyDefs keyDefs={history}/>
+                    <KeyDefs keyDefs={history.map(ke => ke.prompt)}/>
                 </td>
                 <td>
                     <KeyDefs keyDefs={main.keyPrompt}/>
