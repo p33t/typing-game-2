@@ -49,7 +49,20 @@ button {
   font-weight: bold;
 }
 
-.center {
+table.main-table {
   margin-left: auto;
   margin-right: auto;
+}
+
+table.main-table tr td {
+  width: 8em;
+}
+
+p.main-table {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+td.borders {
+  border: 1px solid;
 }

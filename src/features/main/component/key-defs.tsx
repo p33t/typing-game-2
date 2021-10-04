@@ -14,7 +14,7 @@ export default function KeyDefsComponent(props: KeyProps) {
         return className;
     }
     
-    return (<p>
+    return (<p className="main-table">
         {props.keyDefs.map((kd, index) => {
             const char = kd.shift ? defaultShiftCharFor(kd.char) : kd.char;
             return <span key={index} className={calcClassName(kd)}>{char}</span>;

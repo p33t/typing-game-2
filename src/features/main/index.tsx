@@ -28,18 +28,18 @@ export default function MainPage() {
     return (<div>
         <p>Main Page: {main.config.keySetName}</p>
         <MainConfig/>
-        <table className={'center'}>
+        <table className={'main-table'}>
             <tbody>
             <tr>
-                <td>
+                <td align="right">
                     <KeyDefs keyDefs={history.map(ke => ke.prompt)}/>
                 </td>
-                <td>
+                <td align="left" className="borders">
                     <KeyDefs keyDefs={main.keyPrompt}/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td align="right">
                     <KeyDefs keyDefs={history}/>
                 </td>
                 <td>

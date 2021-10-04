@@ -1,5 +1,5 @@
 import {KeyCapture} from "../model";
-import {KeyboardEventHandler, useMemo} from "react";
+import {KeyboardEventHandler, useCallback, useMemo} from "react";
 import {Timestamper} from "../../../common/timing";
 import {defaultRawCharFor, defaultShiftCharFor} from "../../../common/key-key";
 
@@ -23,7 +23,7 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
            .join('') 
     }, [props.value]);
     
-    const onKeyDown: KeyboardEventHandler = (evt) => {
+    const onKeyDown: KeyboardEventHandler = useCallback((evt) => {
         if (evt.key === 'Backspace' || evt.key === 'BACKSPACE' || evt.key.trim().length === 1) {
             const char = evt.shiftKey ? defaultRawCharFor(evt.key) : evt.key;
             props.onCapture(
@@ -38,7 +38,7 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
             );
         }
         evt.preventDefault();
-    };
+    }, []);
 
     return (<input type='text' onKeyDown={onKeyDown} defaultValue={defaultValue}/>);
 }
