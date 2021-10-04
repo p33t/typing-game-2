@@ -106,7 +106,7 @@ function manageKeys(state: MainState) {
                 state.config.keySetName,
                 state.config.shiftEnabled,
                 state.config.controlEnabled,
-                state.config.controlEnabled)
+                state.config.altEnabled)
         };
         state.keyPrompt.length = 0;
         state.keyHistory.length = 0;
