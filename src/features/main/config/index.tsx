@@ -36,6 +36,14 @@ export default function MainConfigComponent() {
         dispatch(configChanged(newConfig));
     }, [config]);
     
+    const onAutoDifficultyChange: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
+        const newConfig = {
+            ...config,
+            difficultyAutoAdjust: evt.target.checked,
+        } as AppConfig;
+        dispatch(configChanged(newConfig));
+    }, [config]);
+    
     return (<>
         <label>Key Set: </label>
         <select value={config.keySetName} onChange={onKeySetChange}>
@@ -51,6 +59,12 @@ export default function MainConfigComponent() {
         <label>Alt</label>
         <br/>
         <label>Target Difficulty: </label>
-        <input type='range' value={config.difficultyTarget} min='0' max={PERFECT.toString()} onChange={onDifficultyChange}/>
+        <input type='range'
+               value={config.difficultyTarget}
+               min='0'
+               max={PERFECT.toString()}
+               onChange={onDifficultyChange}/>
+        <input type="checkbox" onChange={onAutoDifficultyChange} checked={config.difficultyAutoAdjust}/>
+        <label>Auto</label>
     </>);
 }

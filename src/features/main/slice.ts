@@ -1,8 +1,9 @@
 import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
-import {KeyDef, Percent} from "../../common/key-model";
-import {evaluate, isKeyDefMatch, PERFECT} from "./assessment";
+import {KeyDef} from "../../common/key-model";
+import {AssessmentConst, evaluate, isKeyDefMatch, PERFECT} from "./assessment";
+import {Timestamper} from "../../common/timing";
 
 interface MainState {
     /** The next keys being shown to the user for echoing */
@@ -25,6 +26,9 @@ interface MainState {
     
     /** Saves values that are a little expensive to compute every keystroke */
     cache?: AppCache,
+    
+    /** The last time the difficulty was auto adjusted */
+    autoAdjustedAt?: number,
 }
 
 const initialState: MainState = {
@@ -70,12 +74,22 @@ const mainSlice = createSlice({
                     prompt: (prompt as KeyDef)
                 });
             }
-            manageKeys(state);
-            
+
             // this likely won't include the last few key strokes but is OK for now
-            if (keyCapture.keyedAt >= (state.assessment?.assessedAt ?? 0) + 1200) {
+            const evalIsDue = keyCapture.keyedAt >= (state.assessment?.assessedAt ?? 0) + 1200;
+            if (evalIsDue) {
                 state.assessment = evaluate(state.keyHistory);
+
+                // only auto adjust after a fresh assessment
+                if (state.config.difficultyAutoAdjust) {
+                    const autoAdjustIsDue = keyCapture.keyedAt >= (state.autoAdjustedAt ?? 0) + 4000;
+                    if (autoAdjustIsDue) {
+                        adjustDifficulty(state);
+                    }
+                }
             }
+            
+            manageKeys(state);
         },
         backspaced(state) {
             state.buffer.length = Math.max(state.buffer.length - 1, 0);
@@ -86,6 +100,22 @@ const mainSlice = createSlice({
         },
     },
 });
+
+function adjustDifficulty(state: MainState) {
+    const assessment = state.assessment!;
+    const desiredAccuracy = assessment.accuracy === PERFECT ? PERFECT : AssessmentConst.STEADY_ACCURACY;
+    const desiredCombo = Math.sqrt(desiredAccuracy * AssessmentConst.STEADY_SPEED);
+    const actualCombo = Math.sqrt(assessment.accuracy * assessment.speed);
+    const delta = (desiredCombo - actualCombo) / AssessmentConst.DIFFICULTY_GAIN_QUOTIENT;
+    // want rating to go down if current is < desired and VV.
+    let difficultyTarget = state.config.difficultyTarget - delta;
+    difficultyTarget = Math.max(0, difficultyTarget);
+    difficultyTarget = Math.min(PERFECT, difficultyTarget);
+    difficultyTarget = Math.round(difficultyTarget);
+    console.log("New difficulty: " + difficultyTarget)
+    state.config.difficultyTarget = difficultyTarget;
+    state.autoAdjustedAt = Timestamper();
+}
 
 function manageKeys(state: MainState) {
     let historyLength = state.keyHistory.length;

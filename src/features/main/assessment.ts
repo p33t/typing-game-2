@@ -9,7 +9,7 @@ export const AssessmentConst = {
 //     // PERFECT_KEY_RATE_MAX: 8, // at most 8 key per second as the goal
 //     HISTORY_SIZE: 50, // size of sample for assessment  
     DURATION_RANGE_FACTOR: 10, // 10 times slower than perfect is 0% (unless limit is activated)
-//     DIFFICULTY_GAIN_QUOTIENT: 8, // 1/x proportion of the difference will be compensated (default)
+    DIFFICULTY_GAIN_QUOTIENT: 8, // 1/x proportion of the difference will be compensated (default)
     STEADY_ACCURACY: .9 * PERFECT, // the accuracy that is deemed desirable, assuming it can be imperfect
     STEADY_SPEED: .7 * PERFECT, // the speed that is deemed desirable
 }
