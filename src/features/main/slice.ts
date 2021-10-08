@@ -1,8 +1,8 @@
 import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
-import {KeyDef} from "../../common/key-model";
-import {evaluate, isKeyDefMatch} from "./assessment";
+import {KeyDef, Percent} from "../../common/key-model";
+import {evaluate, isKeyDefMatch, PERFECT} from "./assessment";
 
 interface MainState {
     /** The next keys being shown to the user for echoing */
@@ -36,7 +36,8 @@ const initialState: MainState = {
         shiftEnabled: true,
         controlEnabled: false,
         altEnabled: false,
-        autoAdjustDifficulty: true,
+        difficultyAutoAdjust: true,
+        difficultyTarget: PERFECT / 10, // quite low
     },
 }
 
@@ -114,8 +115,10 @@ function manageKeys(state: MainState) {
         state.assessment = undefined;
     }
 
-    // TODO: Will use target difficulty to truncate this array
-    const available = state.cache!.availableKeys;
+    let maxIndex = state.cache!.availableKeys.length - 1;
+    // keep only those within difficulty range
+    maxIndex = Math.round(maxIndex * state.config.difficultyTarget / PERFECT);
+    const available = state.cache!.availableKeys.slice(0, maxIndex + 1);
     while (state.keyPrompt.length < 5) {
         const next = nextKeyPrompt(available, state.keyPrompt);
         state.keyPrompt.push(next);

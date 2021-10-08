@@ -1,5 +1,5 @@
-import {Assessment, KeyEvent, Percent} from "./model";
-import {KeyDef} from "../../common/key-model";
+import {Assessment, KeyEvent} from "./model";
+import {KeyDef, Percent} from "../../common/key-model";
 import {Timestamper} from "../../common/timing";
 
 export const PERFECT: Percent = 100;
@@ -10,8 +10,8 @@ export const AssessmentConst = {
 //     HISTORY_SIZE: 50, // size of sample for assessment  
     DURATION_RANGE_FACTOR: 10, // 10 times slower than perfect is 0% (unless limit is activated)
 //     DIFFICULTY_GAIN_QUOTIENT: 8, // 1/x proportion of the difference will be compensated (default)
-//     STEADY_ACCURACY: .9 * PERFECT, // the accuracy that is deemed desirable
-//     STEADY_SPEED: .7 * PERFECT, // the speed that is deemed desirable
+    STEADY_ACCURACY: .9 * PERFECT, // the accuracy that is deemed desirable, assuming it can be imperfect
+    STEADY_SPEED: .7 * PERFECT, // the speed that is deemed desirable
 }
 //
 // export const GenerationConstant = {

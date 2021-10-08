@@ -1,4 +1,4 @@
-import {KeyDef, KeySetName} from "../../common/key-model";
+import {KeyDef, KeySetName, Percent} from "../../common/key-model";
 
 export type Timestamp = number;
 
@@ -10,15 +10,11 @@ export interface KeyEvent extends KeyCapture {
     prompt: KeyDef,
 }
 
-export type Percent = number;
-
 export type Assessment = {
     assessedAt: number,
     difficulty: Percent,
     accuracy: Percent,
     speed: Percent,
-    // keyCount: number,
-    // correctCount: number,
     overall: Percent,
 }
 
@@ -27,7 +23,8 @@ export type AppConfig = {
     shiftEnabled: boolean;
     altEnabled: boolean;
     controlEnabled: boolean;
-    autoAdjustDifficulty: boolean;
+    difficultyAutoAdjust: boolean;
+    difficultyTarget: Percent,
 };
 
 export type AppCache = {
