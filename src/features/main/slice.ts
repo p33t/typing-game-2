@@ -2,7 +2,7 @@ import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
 import {KeyDef} from "../../common/key-model";
-import {isKeyDefMatch} from "./assessment";
+import {evaluate, isKeyDefMatch} from "./assessment";
 
 interface MainState {
     /** The next keys being shown to the user for echoing */
@@ -70,6 +70,11 @@ const mainSlice = createSlice({
                 });
             }
             manageKeys(state);
+            
+            // this likely won't include the last few key strokes but is OK for now
+            if (keyCapture.keyedAt >= (state.assessment?.assessedAt ?? 0) + 1200) {
+                state.assessment = evaluate(state.keyHistory);
+            }
         },
         backspaced(state) {
             state.buffer.length = Math.max(state.buffer.length - 1, 0);
@@ -106,6 +111,7 @@ function manageKeys(state: MainState) {
         };
         state.keyPrompt.length = 0;
         state.keyHistory.length = 0;
+        state.assessment = undefined;
     }
 
     // TODO: Will use target difficulty to truncate this array
@@ -114,12 +120,6 @@ function manageKeys(state: MainState) {
         const next = nextKeyPrompt(available, state.keyPrompt);
         state.keyPrompt.push(next);
     }
-//    
-//     const assessment = assess(state.keyHistory);
-// }
-//
-// function assess(keyHistory: KeyCapture[]) {
-//    
 }
 
 export const {keyPressed, backspaced, configChanged} = mainSlice.actions;

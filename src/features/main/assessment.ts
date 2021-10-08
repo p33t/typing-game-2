@@ -1,5 +1,6 @@
 import {Assessment, KeyEvent, Percent} from "./model";
 import {KeyDef} from "../../common/key-model";
+import {Timestamper} from "../../common/timing";
 
 export const PERFECT: Percent = 100;
 export const AssessmentConst = {
@@ -43,6 +44,7 @@ export function evaluate(history: KeyEvent[]): Assessment {
     const overall = Math.pow(cube, 1 / 3);
     
     return {
+        assessedAt: Timestamper(),
         difficulty: Math.round(difficulty),
         speed: Math.round(speed),
         accuracy: Math.round(accuracy),

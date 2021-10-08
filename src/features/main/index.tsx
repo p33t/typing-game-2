@@ -50,5 +50,11 @@ export default function MainPage() {
             </tr>
             </tbody>
         </table>
+        <p>
+            Speed: {main.assessment?.speed}<br/>
+            Difficulty: {main.assessment?.difficulty}<br/>
+            Accuracy: {main.assessment?.accuracy}<br/>
+            Overall: {main.assessment?.overall}<br/>
+        </p>
     </div>);
 }

@@ -13,6 +13,7 @@ export interface KeyEvent extends KeyCapture {
 export type Percent = number;
 
 export type Assessment = {
+    assessedAt: number,
     difficulty: Percent,
     accuracy: Percent,
     speed: Percent,
