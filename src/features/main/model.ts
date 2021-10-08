@@ -11,15 +11,14 @@ export interface KeyEvent extends KeyCapture {
 }
 
 export type Percent = number;
-export type Score = number;
 
 export type Assessment = {
-    difficulty: Score,
-    accuracy: Score,
-    speed: Score,
-    keyCount: number,
-    correctCount: number,
-    overall: Score,
+    difficulty: Percent,
+    accuracy: Percent,
+    speed: Percent,
+    // keyCount: number,
+    // correctCount: number,
+    overall: Percent,
 }
 
 export type AppConfig = {

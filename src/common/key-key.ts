@@ -1,4 +1,5 @@
 import {KeyDef, KeySet, KeySetName} from "./key-model";
+import {PERFECT} from "../features/main/assessment";
 
 function calcKeyDifficulties(obj: any): Map<string, number> {
     const tups = Object.keys(obj)
@@ -72,30 +73,34 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
     } as KeyDef];
     if (shiftEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, shift: true, difficulty: t.difficulty + DIFFICULTY_BOOST.shift}) as KeyDef));
+            ({...t, shift: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.shift}) as KeyDef));
     }
 
     if (controlEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, control: true, difficulty: t.difficulty + DIFFICULTY_BOOST.control}) as KeyDef));
+            ({...t, control: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.control}) as KeyDef));
     }
 
     if (altEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, alt: true, difficulty: t.difficulty + DIFFICULTY_BOOST.alt}) as KeyDef));
+            ({...t, alt: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.alt}) as KeyDef));
     }
 
     let result: KeyDef[] = [];
     for (const [key, difficulty] of keySet(keySetName).entries()) {
-        result.push(...templates.map(t => ({...t, char: key, difficulty: t.difficulty + difficulty})));
+        result.push(...templates.map(t => ({...t, char: key, difficulty: t.difficulty! + difficulty})));
     }
 
     // sort by difficulty and keep in original declared order if same difficulty
     result.sort((l, r) => l.difficulty === r.difficulty
         ? 0
-        : l.difficulty > r.difficulty
+        : l.difficulty! > r.difficulty!
             ? 1
             : -1);
+    
+    const increment = PERFECT / (result.length - 1);
+    result.forEach((kd, index) => kd.normDifficulty = index * increment);
+    
     return result;
 }
 

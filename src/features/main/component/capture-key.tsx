@@ -36,7 +36,6 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
                     control: evt.ctrlKey,
                     shift: evt.shiftKey,
                     keyedAt: timestamper(),
-                    difficulty: 0, // TODO: This is smelly
                 },
             );
         }

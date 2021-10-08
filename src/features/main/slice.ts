@@ -1,7 +1,8 @@
 import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
-import {KeyDef, KeySetName} from "../../common/key-model";
+import {KeyDef} from "../../common/key-model";
+import {isKeyDefMatch} from "./assessment";
 
 interface MainState {
     /** The next keys being shown to the user for echoing */
@@ -57,12 +58,7 @@ const mainSlice = createSlice({
             const isMatch = () => {
                 if (state.buffer.length === 0) return false;
                 if (state.keyPrompt.length === 0) return false;
-                const buffer0 = state.buffer[0];
-                const prompt0 = state.keyPrompt[0];
-                return buffer0.char === prompt0.char
-                    && buffer0.shift === prompt0.shift
-                    && buffer0.control === prompt0.control
-                    && buffer0.alt === prompt0.alt;
+                return isKeyDefMatch(state.buffer[0], state.keyPrompt[0]);
             }
     
             while (isMatch()) {
