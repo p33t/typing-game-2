@@ -44,7 +44,7 @@ export default function MainConfigComponent() {
         dispatch(configChanged(newConfig));
     }, [config]);
     
-    return (<>
+    return (<div style={{textAlign: "left"}}>
         <label>Key Set: </label>
         <select value={config.keySetName} onChange={onKeySetChange}>
             {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
@@ -53,18 +53,21 @@ export default function MainConfigComponent() {
         {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
         <label>Modifier Keys: </label>
         <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/> 
-        <label>Shift</label>
+        <label> Shift</label>
         &nbsp;&nbsp;&nbsp;
         <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/> 
-        <label>Alt</label>
+        <label> Alt</label>
         <br/>
         <label>Target Difficulty: </label>
+        <input type="checkbox" onChange={onAutoDifficultyChange} checked={config.difficultyAutoAdjust}/>
+        <label> Auto</label>
+        <br/>
         <input type='range'
+               width='100%'
                value={config.difficultyTarget}
                min='0'
                max={PERFECT.toString()}
+               alt={config.difficultyTarget.toString()}
                onChange={onDifficultyChange}/>
-        <input type="checkbox" onChange={onAutoDifficultyChange} checked={config.difficultyAutoAdjust}/>
-        <label>Auto</label>
-    </>);
+    </div>);
 }

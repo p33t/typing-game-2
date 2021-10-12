@@ -5,6 +5,9 @@ import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
 import MainConfig from './config/index';
 import {useMemo} from "react";
+import {Chart} from "react-google-charts";
+import {Rail, Segment} from "semantic-ui-react";
+import Scoreboard from "./component/scoreboard";
 
 export default function MainPage() {
 
@@ -26,8 +29,9 @@ export default function MainPage() {
     }, [main.keyHistory])
 
     return (<div>
-        <p>Main Page: {main.config.keySetName}</p>
-        <MainConfig/>
+        <Rail position='left'>
+            <MainConfig/>
+        </Rail>
         <table className={'main-table'}>
             <tbody>
             <tr>
@@ -50,11 +54,10 @@ export default function MainPage() {
             </tr>
             </tbody>
         </table>
-        <p>
-            Speed: {main.assessment?.speed}<br/>
-            Difficulty: {main.assessment?.difficulty}<br/>
-            Accuracy: {main.assessment?.accuracy}<br/>
-            Overall: {main.assessment?.overall}<br/>
-        </p>
+        <Rail position='right'>
+            <Segment>
+                <Scoreboard/>
+            </Segment>
+        </Rail>
     </div>);
 }
