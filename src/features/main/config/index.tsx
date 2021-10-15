@@ -1,9 +1,10 @@
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
-import {ChangeEventHandler, useCallback} from "react";
+import {ChangeEventHandler, useCallback, useRef} from "react";
 import {AppConfig} from "../model";
 import {configChanged} from "../slice";
 import {KeySetName, KEY_SET_NAMES} from "../../../common/key-model";
 import {PERFECT} from "../assessment";
+import {Button, Popup} from "semantic-ui-react";
 
 export default function MainConfigComponent() {
     const config = useAppSelector((state) => state.main.config);
@@ -43,6 +44,13 @@ export default function MainConfigComponent() {
         } as AppConfig;
         dispatch(configChanged(newConfig));
     }, [config]);
+
+    const difficultySlider = <input type='range'
+                         style={{width: '100%'}}
+                         value={config.difficultyTarget}
+                         min='0'
+                         max={PERFECT.toString()}
+                         onChange={onDifficultyChange}/>;
     
     return (<div style={{textAlign: "left"}}>
         <label>Key Set: </label>
@@ -52,22 +60,16 @@ export default function MainConfigComponent() {
         <br/>
         {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
         <label>Modifier Keys: </label>
-        <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/> 
+        <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/>
         <label> Shift</label>
         &nbsp;&nbsp;&nbsp;
-        <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/> 
+        <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/>
         <label> Alt</label>
         <br/>
         <label>Target Difficulty: </label>
         <input type="checkbox" onChange={onAutoDifficultyChange} checked={config.difficultyAutoAdjust}/>
         <label> Auto</label>
         <br/>
-        <input type='range'
-               width='100%'
-               value={config.difficultyTarget}
-               min='0'
-               max={PERFECT.toString()}
-               alt={config.difficultyTarget.toString()}
-               onChange={onDifficultyChange}/>
+        <Popup content={config.difficultyTarget.toString()} position='right center' trigger={difficultySlider}/>
     </div>);
 }

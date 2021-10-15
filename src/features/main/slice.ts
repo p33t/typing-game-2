@@ -147,7 +147,7 @@ function manageKeys(state: MainState) {
 
     let maxIndex = state.cache!.availableKeys.length - 1;
     // keep only those within difficulty range
-    maxIndex = Math.round(maxIndex * state.config.difficultyTarget / PERFECT);
+    maxIndex = Math.round((maxIndex - 1) * state.config.difficultyTarget / PERFECT) + 1; // min 2 chars
     const available = state.cache!.availableKeys.slice(0, maxIndex + 1);
     while (state.keyPrompt.length < 5) {
         const next = nextKeyPrompt(available, state.keyPrompt);

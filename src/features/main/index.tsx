@@ -35,7 +35,7 @@ export default function MainPage() {
         <table className={'main-table'}>
             <tbody>
             <tr>
-                <td align="right">
+                <td align="right" width='1*'>
                     <KeyDefs keyDefs={history.map(ke => ke.prompt)}/>
                 </td>
                 <td align="left" className="borders">
@@ -43,7 +43,7 @@ export default function MainPage() {
                 </td>
             </tr>
             <tr>
-                <td align="right">
+                <td align="right" width='1*'>
                     <KeyDefs keyDefs={history}/>
                 </td>
                 <td>

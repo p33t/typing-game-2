@@ -53,7 +53,7 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
         }
     }, [inputRef])
     
-    return (<input type='text'
+    return (<input type='text' className='main-input'
                    ref={(ref) => inputRef.current = ref ?? undefined}
                    defaultValue={defaultValue}/>);
 }

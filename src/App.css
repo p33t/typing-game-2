@@ -61,6 +61,14 @@ table.main-table tr td {
 p.main-table {
   margin-top: 0;
   margin-bottom: 0;
+  font-size: xxx-large;
+  font-family: monospace;
+}
+
+input.main-input {
+  font-size: xxx-large;
+  font-family: monospace;
+  width: 4em;
 }
 
 td.borders {
