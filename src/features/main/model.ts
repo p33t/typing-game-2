@@ -18,6 +18,9 @@ export type Assessment = {
     overall: Percent,
 }
 
+export const ERROR_HANDLING_MODES = ['Ignore', 'Accept', 'Buffer'] as const;
+export type ErrorHandlingMode = typeof ERROR_HANDLING_MODES[number];
+
 export type AppConfig = {
     keySetName: KeySetName;
     shiftEnabled: boolean;
@@ -25,9 +28,10 @@ export type AppConfig = {
     controlEnabled: boolean;
     difficultyAutoAdjust: boolean;
     difficultyTarget: Percent,
+    errorHandlingMode: ErrorHandlingMode,
 };
 
 export type AppCache = {
     configHash: string;
-    availableKeys: KeyDef[];
+    availableKeys: RatedKeyDef[];
 }

@@ -1,13 +1,13 @@
 import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
-import {KeyDef} from "../../common/key-model";
+import {RatedKeyDef} from "../../common/key-model";
 import {AssessmentConst, evaluate, isKeyDefMatch, PERFECT} from "./assessment";
 import {Timestamper} from "../../common/timing";
 
 interface MainState {
     /** The next keys being shown to the user for echoing */
-    keyPrompt: KeyDef[],
+    keyPrompt: RatedKeyDef[],
     
     /** The history of keys pressed up to a maximum length */
     keyHistory: KeyEvent[],
@@ -42,6 +42,7 @@ const initialState: MainState = {
         altEnabled: false,
         difficultyAutoAdjust: true,
         difficultyTarget: PERFECT / 10, // quite low
+        errorHandlingMode: "Accept",
     },
 }
 
@@ -71,7 +72,7 @@ const mainSlice = createSlice({
                 const prompt = state.keyPrompt.shift();
                 state.keyHistory.push({
                     ...consumed!,
-                    prompt: (prompt as KeyDef)
+                    prompt: (prompt as RatedKeyDef)
                 });
             }
 
@@ -112,7 +113,7 @@ function adjustDifficulty(state: MainState) {
     difficultyTarget = Math.max(0, difficultyTarget);
     difficultyTarget = Math.min(PERFECT, difficultyTarget);
     difficultyTarget = Math.round(difficultyTarget);
-    console.log("New difficulty: " + difficultyTarget)
+    console.log(`New difficulty: ${delta < 0 ? '-' : '+'}${Math.abs(delta)} = ${difficultyTarget}`)
     state.config.difficultyTarget = difficultyTarget;
     state.autoAdjustedAt = Timestamper();
 }

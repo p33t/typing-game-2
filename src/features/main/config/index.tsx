@@ -1,34 +1,43 @@
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
-import {ChangeEventHandler, useCallback, useRef} from "react";
+import React, {ChangeEventHandler, FormEvent, useCallback, useRef} from "react";
 import {AppConfig} from "../model";
 import {configChanged} from "../slice";
-import {KeySetName, KEY_SET_NAMES} from "../../../common/key-model";
+import {KEY_SET_NAMES, KeySetName} from "../../../common/key-model";
 import {PERFECT} from "../assessment";
-import {Button, Popup} from "semantic-ui-react";
+import {CheckboxProps, DropdownItemProps, Form, FormInput, Popup, Select} from "semantic-ui-react";
 
 export default function MainConfigComponent() {
     const config = useAppSelector((state) => state.main.config);
     const dispatch = useAppDispatch();
 
-    const onKeySetChange: ChangeEventHandler<HTMLSelectElement> = useCallback((evt) => {
-        const keySetName = evt.target.value as KeySetName;
+    const onKeySetChange = useCallback((evt: React.SyntheticEvent<HTMLElement, Event>) => {
+        const keySetName = (evt.target as any).textContent as KeySetName;
         const newConfig = {
             ...config,
             keySetName,
         } as AppConfig;
         dispatch(configChanged(newConfig));
+        evt.preventDefault();
     }, [config]);
-    
-    const onToggleModifier: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
-        const enabled = evt.target.checked;
-        const propName = evt.target.value;
+
+    const keySetNameOptions = KEY_SET_NAMES.map(name => {
+            return {
+                key: name,
+                text: name,
+                value: name,
+            } as DropdownItemProps
+        }
+    );
+
+    const onToggle = useCallback((evt: FormEvent<HTMLInputElement>, checkBoxProps: CheckboxProps) => {
+        const propName = checkBoxProps.value as keyof AppConfig;
         const newConfig = {
             ...config,
-            [propName]: enabled,
+            [propName]: config[propName] === false,
         } as AppConfig;
         dispatch(configChanged(newConfig));
     }, [config]);
-    
+
     const onDifficultyChange: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
         const newConfig = {
             ...config,
@@ -36,40 +45,57 @@ export default function MainConfigComponent() {
         } as AppConfig;
         dispatch(configChanged(newConfig));
     }, [config]);
-    
-    const onAutoDifficultyChange: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
-        const newConfig = {
-            ...config,
-            difficultyAutoAdjust: evt.target.checked,
-        } as AppConfig;
-        dispatch(configChanged(newConfig));
-    }, [config]);
 
     const difficultySlider = <input type='range'
-                         style={{width: '100%'}}
-                         value={config.difficultyTarget}
-                         min='0'
-                         max={PERFECT.toString()}
-                         onChange={onDifficultyChange}/>;
-    
+                                    style={{width: '100%'}}
+                                    value={config.difficultyTarget}
+                                    min='0'
+                                    max={PERFECT.toString()}
+                                    onChange={onDifficultyChange}/>;
+
+    const keySetWrapper = useRef();
+
     return (<div style={{textAlign: "left"}}>
-        <label>Key Set: </label>
-        <select value={config.keySetName} onChange={onKeySetChange}>
-            {KEY_SET_NAMES.map((ksc) => <option key={ksc} value={ksc}>{ksc}</option>)}
-        </select>
-        <br/>
-        {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
-        <label>Modifier Keys: </label>
-        <input type="checkbox" value="shiftEnabled" onChange={onToggleModifier} checked={config.shiftEnabled}/>
-        <label> Shift</label>
-        &nbsp;&nbsp;&nbsp;
-        <input type="checkbox" value="altEnabled" onChange={onToggleModifier} checked={config.altEnabled}/>
-        <label> Alt</label>
-        <br/>
-        <label>Target Difficulty: </label>
-        <input type="checkbox" onChange={onAutoDifficultyChange} checked={config.difficultyAutoAdjust}/>
-        <label> Auto</label>
-        <br/>
-        <Popup content={config.difficultyTarget.toString()} position='right center' trigger={difficultySlider}/>
-    </div>);
+            <Form>
+                <Form.Select
+                    label='Key Set:'
+                    inline
+                    value={config.keySetName}
+                    onChange={onKeySetChange}
+                    options={keySetNameOptions}/>
+                {/* TODO: Figure out extra form labels... <Form.Field inline label='Modifiers:'>*/}
+                <Form.Field>
+                    Modifiers:
+                    <Form.Radio
+                        inline
+                        value='shiftEnabled'
+                        label='Shift'
+                        toggle
+                        checked={config.shiftEnabled}
+                        onChange={onToggle}
+                    />
+                    <Form.Radio
+                        inline
+                        value='altEnabled'
+                        label='Alt'
+                        toggle
+                        checked={config.altEnabled}
+                        onChange={onToggle}
+                    />
+                    {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
+                </Form.Field>
+
+                Target Difficulty:
+                <Form.Radio
+                    inline
+                    value='difficultyAutoAdjust'
+                    label='Auto'
+                    toggle
+                    checked={config.difficultyAutoAdjust}
+                    onChange={onToggle}
+                />
+                <Popup content={config.difficultyTarget.toString()} position='right center' trigger={difficultySlider}/>
+            </Form>
+        </div>
+    );
 }

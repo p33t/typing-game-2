@@ -145,9 +145,9 @@ export function defaultRawCharFor(shiftedChar: string) {
 }
 
 /** Randomly selects a key from those available while avoiding the given recent keys */
-export function nextKeyPrompt(available: KeyDef[], recent: KeyDef[]): KeyDef {
+export function nextKeyPrompt(available: RatedKeyDef[], recent: KeyDef[]): RatedKeyDef {
     let attempts = 0;
-    let candidate: KeyDef | undefined;
+    let candidate: RatedKeyDef | undefined;
     while (attempts < 4) {
         attempts++;
         const ix = Math.floor(Math.random() * available.length);
