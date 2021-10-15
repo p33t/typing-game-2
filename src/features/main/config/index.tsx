@@ -1,10 +1,10 @@
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
-import React, {ChangeEventHandler, FormEvent, useCallback, useRef} from "react";
+import React, {ChangeEventHandler, FormEvent, useCallback} from "react";
 import {AppConfig, ERROR_HANDLING_MODES, ErrorHandlingMode} from "../model";
 import {configChanged} from "../slice";
 import {KEY_SET_NAMES, KeySetName} from "../../../common/key-model";
 import {PERFECT} from "../assessment";
-import {CheckboxProps, DropdownItemProps, Form, FormInput, Popup, Radio, RadioProps, Select} from "semantic-ui-react";
+import {CheckboxProps, DropdownItemProps, Form, Popup, Radio, RadioProps} from "semantic-ui-react";
 
 export default function MainConfigComponent() {
     const config = useAppSelector((state) => state.main.config);
@@ -64,8 +64,6 @@ export default function MainConfigComponent() {
                                     max={PERFECT.toString()}
                                     onChange={onDifficultyChange}/>;
 
-    const keySetWrapper = useRef();
-
     return (<div style={{textAlign: "left"}}>
             <Form>
                 <Form.Select
@@ -74,19 +72,19 @@ export default function MainConfigComponent() {
                     value={config.keySetName}
                     onChange={onKeySetChange}
                     options={keySetNameOptions}/>
-                {/* TODO: Figure out extra form labels... <Form.Field inline label='Modifiers:'>*/}
-                <Form.Field>
-                    Modifiers:
-                    <Form.Radio
-                        inline
+                <Form.Group inline>
+                    <label>Modifiers:</label>
+                    <Radio
+                        inline='true'
                         value='shiftEnabled'
                         label='Shift'
                         toggle
                         checked={config.shiftEnabled}
                         onChange={onToggle}
                     />
-                    <Form.Radio
-                        inline
+                    &nbsp;&nbsp;&nbsp;
+                    <Radio
+                        inline='true'
                         value='altEnabled'
                         label='Alt'
                         toggle
@@ -94,13 +92,13 @@ export default function MainConfigComponent() {
                         onChange={onToggle}
                     />
                     {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
-                </Form.Field>
+                </Form.Group>
 
-                <Form.Field>
-                    Errors:
-                    {ERROR_HANDLING_MODES.map(mode => {
+                <Form.Group inline>
+                    <label>Errors:</label>
+                    {ERROR_HANDLING_MODES.map((mode, index) => {
                         return (<span key={mode}>
-                            &nbsp;&nbsp;&nbsp;
+                            {index > 0 && <>&nbsp;&nbsp;&nbsp;</>}
                             <Radio
                                 label={mode}
                                 value={mode}
@@ -109,10 +107,10 @@ export default function MainConfigComponent() {
                             />
                         </span>);
                     })}
-                </Form.Field>
+                </Form.Group>
 
-                <Form.Field>
-                    Target Difficulty:
+                <Form.Group inline>
+                    <label>Target Difficulty:</label>
                     <Form.Radio
                         inline
                         value='difficultyAutoAdjust'
@@ -121,9 +119,10 @@ export default function MainConfigComponent() {
                         checked={config.difficultyAutoAdjust}
                         onChange={onToggle}
                     />
-                    <Popup content={config.difficultyTarget.toString()} position='right center'
-                           trigger={difficultySlider}/>
-                </Form.Field>
+                </Form.Group>
+                <Popup content={config.difficultyTarget.toString()}
+                       position='right center'
+                       trigger={difficultySlider}/>
             </Form>
         </div>
     );
