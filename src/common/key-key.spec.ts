@@ -1,5 +1,4 @@
 import {defaultShiftCharFor, listKeys, keyRating, listKeyDefs} from './key-key';
-import {PERFECT, permittedKeys} from "../features/main/assessment";
 
 const isUnique = (arr: string[]) => new Set(arr).size === arr.length;
 

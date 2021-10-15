@@ -9,7 +9,9 @@ export interface KeyDef {
     control: boolean,
     alt: boolean,
     shift: boolean,
-    // TODO: Maybe introduce a RatedKeyDef
-    difficulty?: number,
-    normDifficulty?: Percent,
+}
+
+export interface RatedKeyDef extends KeyDef{
+    difficulty: number,
+    normDifficulty: Percent,
 }

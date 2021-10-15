@@ -1,4 +1,4 @@
-import {KeyDef, KeySetName, Percent} from "../../common/key-model";
+import {KeyDef, KeySetName, Percent, RatedKeyDef} from "../../common/key-model";
 
 export type Timestamp = number;
 
@@ -7,7 +7,7 @@ export interface KeyCapture extends KeyDef {
 }
 
 export interface KeyEvent extends KeyCapture {
-    prompt: KeyDef,
+    prompt: RatedKeyDef,
 }
 
 export type Assessment = {
