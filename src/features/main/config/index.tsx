@@ -1,10 +1,10 @@
 import {useAppDispatch, useAppSelector} from "../../../app/hooks";
 import React, {ChangeEventHandler, FormEvent, useCallback, useRef} from "react";
-import {AppConfig} from "../model";
+import {AppConfig, ERROR_HANDLING_MODES, ErrorHandlingMode} from "../model";
 import {configChanged} from "../slice";
 import {KEY_SET_NAMES, KeySetName} from "../../../common/key-model";
 import {PERFECT} from "../assessment";
-import {CheckboxProps, DropdownItemProps, Form, FormInput, Popup, Select} from "semantic-ui-react";
+import {CheckboxProps, DropdownItemProps, Form, FormInput, Popup, Radio, RadioProps, Select} from "semantic-ui-react";
 
 export default function MainConfigComponent() {
     const config = useAppSelector((state) => state.main.config);
@@ -36,6 +36,16 @@ export default function MainConfigComponent() {
             [propName]: config[propName] === false,
         } as AppConfig;
         dispatch(configChanged(newConfig));
+        evt.preventDefault();
+    }, [config]);
+
+    const onToggleErrorMode = useCallback((evt: FormEvent<HTMLInputElement>, radioProps: RadioProps) => {
+        const newConfig = {
+            ...config,
+            errorHandlingMode: radioProps.value as ErrorHandlingMode,
+        } as AppConfig;
+        dispatch(configChanged(newConfig));
+        evt.preventDefault();
     }, [config]);
 
     const onDifficultyChange: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
@@ -44,6 +54,7 @@ export default function MainConfigComponent() {
             difficultyTarget: Number(evt.target.value),
         } as AppConfig;
         dispatch(configChanged(newConfig));
+        evt.preventDefault();
     }, [config]);
 
     const difficultySlider = <input type='range'
@@ -85,16 +96,34 @@ export default function MainConfigComponent() {
                     {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
                 </Form.Field>
 
-                Target Difficulty:
-                <Form.Radio
-                    inline
-                    value='difficultyAutoAdjust'
-                    label='Auto'
-                    toggle
-                    checked={config.difficultyAutoAdjust}
-                    onChange={onToggle}
-                />
-                <Popup content={config.difficultyTarget.toString()} position='right center' trigger={difficultySlider}/>
+                <Form.Field>
+                    Errors:
+                    {ERROR_HANDLING_MODES.map(mode => {
+                        return (<span key={mode}>
+                            &nbsp;&nbsp;&nbsp;
+                            <Radio
+                                label={mode}
+                                value={mode}
+                                checked={config.errorHandlingMode === mode}
+                                onChange={onToggleErrorMode}
+                            />
+                        </span>);
+                    })}
+                </Form.Field>
+
+                <Form.Field>
+                    Target Difficulty:
+                    <Form.Radio
+                        inline
+                        value='difficultyAutoAdjust'
+                        label='Auto'
+                        toggle
+                        checked={config.difficultyAutoAdjust}
+                        onChange={onToggle}
+                    />
+                    <Popup content={config.difficultyTarget.toString()} position='right center'
+                           trigger={difficultySlider}/>
+                </Form.Field>
             </Form>
         </div>
     );

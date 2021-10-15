@@ -8,10 +8,10 @@ import {Timestamper} from "../../common/timing";
 interface MainState {
     /** The next keys being shown to the user for echoing */
     keyPrompt: RatedKeyDef[],
-    
+
     /** The history of keys pressed up to a maximum length */
     keyHistory: KeyEvent[],
-    
+
     /** Incorrect keystrokes entered by the user since the last correct keystroke */
     buffer: KeyCapture[],
 
@@ -20,13 +20,13 @@ interface MainState {
 
     /** Message shown to the user */
     message?: string,
-    
+
     /** User editable configuration */
     config: AppConfig,
-    
+
     /** Saves values that are a little expensive to compute every keystroke */
     cache?: AppCache,
-    
+
     /** The last time the difficulty was auto adjusted */
     autoAdjustedAt?: number,
 }
@@ -36,7 +36,7 @@ const initialState: MainState = {
     keyHistory: [],
     buffer: [],
     config: {
-        keySetName: "US Letters",  
+        keySetName: "US Letters",
         shiftEnabled: true,
         controlEnabled: false,
         altEnabled: false,
@@ -59,21 +59,24 @@ const mainSlice = createSlice({
                 throw new Error("No key prompt to compare");
             }
 
-            state.buffer.push(keyCapture);
+            const prompt = state.keyPrompt[0];
 
-            const isMatch = () => {
-                if (state.buffer.length === 0) return false;
-                if (state.keyPrompt.length === 0) return false;
-                return isKeyDefMatch(state.buffer[0], state.keyPrompt[0]);
-            }
-    
-            while (isMatch()) {
-                const consumed = state.buffer.shift();
-                const prompt = state.keyPrompt.shift();
+            const isMatch = isKeyDefMatch(keyCapture, prompt);
+            const mode = state.config.errorHandlingMode;
+            const canConsume = (mode === "Accept")
+                || (mode === "Buffer" && state.buffer.length === 0 && isMatch)
+                || (mode === "Ignore" && isMatch)
+            ;
+
+            if (canConsume) {
                 state.keyHistory.push({
-                    ...consumed!,
-                    prompt: (prompt as RatedKeyDef)
+                    ...keyCapture,
+                    prompt
                 });
+                state.buffer.length = 0;
+                state.keyPrompt.shift();
+            } else if (mode === "Buffer" || mode === "Ignore") {
+                state.buffer.push(keyCapture);
             }
 
             // this likely won't include the last few key strokes but is OK for now
@@ -89,7 +92,7 @@ const mainSlice = createSlice({
                     }
                 }
             }
-            
+
             manageKeys(state);
         },
         backspaced(state) {
@@ -104,7 +107,7 @@ const mainSlice = createSlice({
 
 function adjustDifficulty(state: MainState) {
     const assessment = state.assessment!;
-    const desiredAccuracy = assessment.accuracy === PERFECT ? PERFECT : AssessmentConst.STEADY_ACCURACY;
+    const desiredAccuracy = state.config.errorHandlingMode !== "Accept" ? PERFECT : AssessmentConst.STEADY_ACCURACY;
     const desiredCombo = Math.sqrt(desiredAccuracy * AssessmentConst.STEADY_SPEED);
     const actualCombo = Math.sqrt(assessment.accuracy * assessment.speed);
     const delta = (desiredCombo - actualCombo) / AssessmentConst.DIFFICULTY_GAIN_QUOTIENT;
