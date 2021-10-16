@@ -49,6 +49,11 @@ button {
   font-weight: bold;
 }
 
+.key-error {
+  text-decoration: line-through;
+  color: darkred;
+}
+
 table.main-table {
   margin-left: auto;
   margin-right: auto;

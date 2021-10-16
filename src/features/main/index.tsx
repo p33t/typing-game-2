@@ -4,10 +4,10 @@ import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
 import MainConfig from './config/index';
-import {useMemo} from "react";
-import {Chart} from "react-google-charts";
+import {useCallback, useMemo} from "react";
 import {Rail, Segment} from "semantic-ui-react";
 import Scoreboard from "./component/scoreboard";
+import {isKeyDefMatch} from "./assessment";
 
 export default function MainPage() {
 
@@ -28,6 +28,11 @@ export default function MainPage() {
         return main.keyHistory.slice(start)
     }, [main.keyHistory])
 
+    const isCorrect = useCallback((index: number) => {
+        const ke = history[index];
+        return isKeyDefMatch(ke, ke.prompt);
+    }, [main.keyHistory]);
+
     return (<div>
         <Rail position='left'>
             <MainConfig/>
@@ -44,12 +49,13 @@ export default function MainPage() {
             </tr>
             <tr>
                 <td align="right" width='1*'>
-                    <KeyDefs keyDefs={history}/>
+                    <KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>
                 </td>
                 <td>
                     <CaptureKey
                         onCapture={onKeyCapture}
-                        value={main.buffer}/>
+                        value={main.buffer}
+                        selectAll={main.config.errorHandlingMode === "Ignore"}/>
                 </td>
             </tr>
             </tbody>
