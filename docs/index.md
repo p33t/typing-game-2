@@ -1,5 +1,5 @@
-# `arketype` Documentation
-`arketype` is web app for gradually improving typing skill on unfamiliar keyboards.
+# Arketyper Documentation
+Arketyper is web application for gradually improving typing skill on unfamiliar keyboards.
 
 > :bulb: If you'd like a keyboard layout added please [contact me](https://www.freshcode.biz/).
 

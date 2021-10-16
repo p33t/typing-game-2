@@ -1,10 +1,10 @@
-# arketyper
+# Arketyper
 Adaptive random keyboard typing trainer
 
 ## Description
 A web app for gradually improving typing skill on unfamiliar keyboards.  
-![Main Screenshot](public/docs/screenshot-main.png)
-See also [Documentation](public/docs/index.md)
+![Main Screenshot](docs/screenshot-main.png)
+See also [Documentation](docs/index.md)
 
 ## Installation
 ### Online
