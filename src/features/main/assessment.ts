@@ -4,7 +4,7 @@ import {Timestamper} from "../../common/timing";
 
 export const PERFECT: Percent = 100;
 export const AssessmentConst = {
-    PERFECT_KEY_RATE_DEFAULT: 7, // equals a score of 100% for keys per sec (default)
+    PERFECT_KEY_RATE_DEFAULT: 5, // equals a score of 100% for keys per sec (default)
 //     // PERFECT_KEY_RATE_MIN: 1, // need at least one key per second as the goal
 //     // PERFECT_KEY_RATE_MAX: 8, // at most 8 key per second as the goal
 //     HISTORY_SIZE: 50, // size of sample for assessment  

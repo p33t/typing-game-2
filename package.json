@@ -1,6 +1,6 @@
 {
-  "name": "typing-game-2",
-  "version": "0.0.0",
+  "name": "arketyper",
+  "version": "1.0.0-alpha",
   "scripts": {
     "dev": "vite",
     "test": "jest",
