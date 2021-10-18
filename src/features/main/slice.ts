@@ -123,7 +123,7 @@ function adjustDifficulty(state: MainState) {
 
 function manageKeys(state: MainState) {
     let historyLength = state.keyHistory.length;
-    while (historyLength > 20) {
+    while (historyLength > 10) {
         state.keyHistory.shift();
         historyLength--;
     }
@@ -153,7 +153,7 @@ function manageKeys(state: MainState) {
     // keep only those within difficulty range
     maxIndex = Math.round((maxIndex - 1) * state.config.difficultyTarget / PERFECT) + 1; // min 2 chars
     const available = state.cache!.availableKeys.slice(0, maxIndex + 1);
-    while (state.keyPrompt.length < 5) {
+    while (state.keyPrompt.length < 6) {
         const next = nextKeyPrompt(available, state.keyPrompt);
         state.keyPrompt.push(next);
     }
