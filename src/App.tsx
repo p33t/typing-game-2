@@ -1,11 +1,12 @@
 import './App.css'
 import 'semantic-ui-css/semantic.min.css'
 import MainPage from './features/main/index'
-import {Button, Grid, Header, Icon, Image, Modal, Segment} from 'semantic-ui-react'
+import {Grid, Header, Icon, Image, Modal, Segment} from 'semantic-ui-react'
 import React from "react";
 
 function App() {
-    const [open, setOpen] = React.useState(false)
+    const [open, setOpen] = React.useState(false);
+    
     return (
         <div className="App">
             <Grid textAlign='center' style={{height: '100vh'}} verticalAlign='middle'>
@@ -23,7 +24,10 @@ function App() {
                                 onClose={() => setOpen(false)}
                                 onOpen={() => setOpen(true)}
                             >
-                                <Header icon='info circle' content='About Arketyper'/>
+                                <Header>
+                                    <Icon name='info circle'/>
+                                    Arketyper __APP_VERSION__
+                                </Header>
                                 <Modal.Content>
                                     <p>
                                         Arketyper is designed to gradually improving typing skill on unfamiliar
