@@ -4,8 +4,8 @@ import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
 import MainConfig from './config/index';
-import {useCallback, useMemo} from "react";
-import {Rail, Segment} from "semantic-ui-react";
+import React, {useCallback, useMemo} from "react";
+import {Popup, Rail, Segment} from "semantic-ui-react";
 import Scoreboard from "./component/scoreboard";
 import {isKeyDefMatch} from "./assessment";
 
@@ -49,10 +49,13 @@ export default function MainPage() {
             </tr>
             <tr>
                 <td align="right" width='1*'>
-                    <KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>
+                    <Popup content='Type the letters above in here'
+                           position='left center'
+                           trigger={<KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>}/>
                 </td>
                 <td>
                     <CaptureKey
+                        popupTip={main.touched === false}
                         onCapture={onKeyCapture}
                         value={main.buffer}
                         selectAll={main.config.errorHandlingMode === "Ignore"}/>

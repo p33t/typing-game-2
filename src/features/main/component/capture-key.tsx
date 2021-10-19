@@ -1,7 +1,8 @@
 import {KeyCapture} from "../model";
-import {useCallback, useEffect, useMemo, useRef} from "react";
+import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {Timestamper} from "../../../common/timing";
 import {defaultRawCharFor, defaultShiftCharFor} from "../../../common/key-key";
+import {Popup} from "semantic-ui-react";
 
 interface CaptureKeyProps {
     value: KeyCapture[],
@@ -9,6 +10,8 @@ interface CaptureKeyProps {
     onCapture(keyCapture: KeyCapture): void,
 
     selectAll: boolean,
+
+    popupTip: boolean,
 }
 
 export default function CaptureKeyComponent(props: CaptureKeyProps) {
@@ -60,7 +63,13 @@ export default function CaptureKeyComponent(props: CaptureKeyProps) {
         if (props.selectAll) inputRef.current?.select();
     }, [inputRef, props.value, props.selectAll])
 
-    return (<input type='text' className='main-input'
-                   ref={(ref) => inputRef.current = ref ?? undefined}
-                   defaultValue={defaultValue}/>);
+    return (<Popup
+            inverted
+            content='Type the letters above in here'
+            position='left center'
+            open={props.popupTip}
+            trigger={<input type='text' className='main-input'
+                            ref={(ref) => inputRef.current = ref ?? undefined}
+                            defaultValue={defaultValue}/>}/>
+    );
 }

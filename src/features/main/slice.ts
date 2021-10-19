@@ -29,12 +29,16 @@ interface MainState {
 
     /** The last time the difficulty was auto adjusted */
     autoAdjustedAt?: number,
+    
+    /** Flag indicating user has interacted with the UI */
+    touched: boolean,
 }
 
 const initialState: MainState = {
     keyPrompt: [],
     keyHistory: [],
     buffer: [],
+    touched: false,
     config: {
         keySetName: "US Letters",
         shiftEnabled: true,
@@ -42,7 +46,7 @@ const initialState: MainState = {
         altEnabled: false,
         difficultyAutoAdjust: true,
         difficultyTarget: PERFECT / 10, // quite low
-        errorHandlingMode: "Accept",
+        errorHandlingMode: "Ignore",
     },
 }
 
@@ -54,6 +58,7 @@ const mainSlice = createSlice({
     initialState,
     reducers: {
         keyPressed(state, action: PayloadAction<{ keyCapture: KeyCapture }>) {
+            state.touched = true;
             const {keyCapture} = action.payload;
             if (state.keyPrompt.length === 0) {
                 throw new Error("No key prompt to compare");
@@ -99,6 +104,7 @@ const mainSlice = createSlice({
             state.buffer.length = Math.max(state.buffer.length - 1, 0);
         },
         configChanged(state, action: PayloadAction<AppConfig>) {
+            state.touched = true;
             state.config = action.payload;
             manageKeys(state);
         },
