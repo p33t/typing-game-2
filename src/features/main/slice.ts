@@ -84,8 +84,10 @@ const mainSlice = createSlice({
                 state.buffer.push(keyCapture);
             }
 
-            // this likely won't include the last few key strokes but is OK for now
-            const evalIsDue = keyCapture.keyedAt >= (state.assessment?.assessedAt ?? 0) + 1200;
+            // This likely won't include the last few key strokes but is OK for now
+            // Avoid assessing on first 2 keystrokes because score will be '0'
+            const evalIsDue = state.keyHistory.length >= 2 
+                && keyCapture.keyedAt >= (state.assessment?.assessedAt ?? state.keyHistory[0]!.keyedAt) + 1200;
             if (evalIsDue) {
                 state.assessment = evaluate(state.keyHistory);
 
