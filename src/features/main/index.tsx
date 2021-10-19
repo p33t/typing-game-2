@@ -54,11 +54,15 @@ export default function MainPage() {
                            trigger={<KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>}/>
                 </td>
                 <td>
-                    <CaptureKey
-                        popupTip={main.touched === false}
-                        onCapture={onKeyCapture}
-                        value={main.buffer}
-                        selectAll={main.config.errorHandlingMode === "Ignore"}/>
+                    <Popup
+                        inverted
+                        content='Type the letters above in here'
+                        position='left center'
+                        open={main.touched === false}
+                        trigger={<CaptureKey
+                            onCapture={onKeyCapture}
+                            value={main.buffer}
+                            selectAll={main.config.errorHandlingMode === "Ignore"}/>}/>
                 </td>
             </tr>
             </tbody>
