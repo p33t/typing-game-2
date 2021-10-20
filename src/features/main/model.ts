@@ -7,6 +7,10 @@ export interface KeyCapture extends KeyDef {
 }
 
 export interface KeyEvent extends KeyCapture {
+    /** Assessment of the individual key stroke / event.  The first keystroke has no assessment. */
+    assessment?: Assessment,
+    
+    /** The prompted character which may be different if using 'Accept' error handling mode */
     prompt: RatedKeyDef,
 }
 

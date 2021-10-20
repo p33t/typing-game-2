@@ -1,4 +1,4 @@
-import {AssessmentConst, calcAccuracy, calcDifficulty, calcSpeed, evaluate, PERFECT} from './assessment';
+import {assess, AssessmentConst, calcMovingAverage, PERFECT} from './assessment';
 import {KeyEvent} from './model';
 import {KeyDef} from '../../common/key-model';
 
@@ -9,43 +9,54 @@ function createHistory(eventCount: number): KeyEvent[] {
         result.push({
             ...aMax,
             keyedAt: ix,
-            prompt: {...aMax, difficulty: 20, normDifficulty: 80}
+            prompt: {...aMax, relativeDifficulty: 20, normDifficulty: 80},
+            assessment: {
+                difficulty: 0,
+                overall: 0,
+                accuracy: 0,
+                speed: 0,
+                assessedAt: ix,
+            },
         });
     }
     return result;
 }
 
-test('calcAccuracy()', () => {
+test('assess() accurate, fast', () => {
+    const keyEvent = createHistory(1)[0];
+    const actual = assess(keyEvent.prompt, PERFECT_INTERVAL, keyEvent);
+    expect(actual.speed).toBe(PERFECT);
+    expect(actual.difficulty).toBe(80);
+    expect(actual.accuracy).toBe(PERFECT);
+    expect(actual.overall).toBe(280 / 3)
+});
+
+test('assess() inaccurate, slow', () => {
+    const keyEvent = createHistory(1)[0];
+    keyEvent.prompt.char = 'b'; // inaccurate
+    keyEvent.prompt.normDifficulty = 90;
+    const actual = assess(keyEvent.prompt, WORST_INTERVAL, keyEvent);
+    expect(actual.speed).toBe(0);
+    expect(actual.difficulty).toBe(90);
+    expect(actual.accuracy).toBe(0);
+    expect(actual.overall).toBe(90 / 3)
+});
+
+const PERFECT_INTERVAL = 1000 / AssessmentConst.PERFECT_KEY_RATE_DEFAULT;
+const WORST_INTERVAL = AssessmentConst.INTERVAL_RANGE_FACTOR * PERFECT_INTERVAL;
+
+test('calcMovingAverage()', () => {
     const history = createHistory(3);
-    history[0].char = 'b'; // wrong input
-    expect(calcAccuracy(history)).toBe(PERFECT * 2 / 3);
-    expect(calcAccuracy([])).toBe(PERFECT);
-});
-
-test('calcDifficulty()', () => {
-    const history = createHistory(3);
-    history[0].prompt.normDifficulty = 50; // much less difficult
-    expect(calcDifficulty(history)).toBe((50 + 80 + 80) / 3);
-    expect(calcDifficulty([])).toBe(0);
-});
-
-const PERFECT_DURATION = 1000 / AssessmentConst.PERFECT_KEY_RATE_DEFAULT;
-const WORST_DURATION = AssessmentConst.DURATION_RANGE_FACTOR * PERFECT_DURATION;
-
-test('calcSpeed()', () => {
-    const history = createHistory(5);
-    history[1].keyedAt = PERFECT_DURATION; // 100 %
-    history[2].keyedAt = history[1].keyedAt * (AssessmentConst.DURATION_RANGE_FACTOR + 1); // 0 %
-    history[3].keyedAt = history[2].keyedAt; // 0 duration (infinitely good)
-    history[4].keyedAt = history[3].keyedAt + 10000; // really bad
-    expect(calcSpeed(history)).toBe(50); // average to mid-way
-    expect(calcSpeed([])).toBe(0);
-});
-
-test('evaluate()', () => {
-    const history = createHistory(2);
-    history[0].char = 'b'; // wrong input => 50% accuracy
-    history[0].prompt.normDifficulty = 60; // less difficult => 70% avg
-    history[1].keyedAt = (WORST_DURATION + PERFECT_DURATION) / 2; // 50% speed 
-    expect(evaluate(history).overall).toBe(56); //Math.round(Math.pow(50 * 70 * 50, 1 / 3)));
+    history[0].assessment = undefined;
+    history[1].assessment!.speed = 20;
+    history[1].assessment!.accuracy = 30;
+    history[1].assessment!.difficulty = 40;
+    history[2].assessment!.speed = 50;
+    history[2].assessment!.accuracy = 60;
+    history[2].assessment!.difficulty = 70;
+    const avg = calcMovingAverage(history);
+    expect(avg.speed).toBe(35);
+    expect(avg.accuracy).toBe(45);
+    expect(avg.difficulty).toBe(55);
+    expect(avg.overall).toBe(45);
 });

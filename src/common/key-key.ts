@@ -69,33 +69,33 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
         alt: false,
         control: false,
         shift: false,
-        difficulty: 0,
+        relativeDifficulty: 0,
         normDifficulty: 0,
     } as RatedKeyDef];
     if (shiftEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, shift: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.shift}) as RatedKeyDef));
+            ({...t, shift: true, relativeDifficulty: t.relativeDifficulty! + DIFFICULTY_BOOST.shift}) as RatedKeyDef));
     }
 
     if (controlEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, control: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.control}) as RatedKeyDef));
+            ({...t, control: true, relativeDifficulty: t.relativeDifficulty! + DIFFICULTY_BOOST.control}) as RatedKeyDef));
     }
 
     if (altEnabled) {
         templates.push(...templates.map(t =>
-            ({...t, alt: true, difficulty: t.difficulty! + DIFFICULTY_BOOST.alt}) as RatedKeyDef));
+            ({...t, alt: true, relativeDifficulty: t.relativeDifficulty! + DIFFICULTY_BOOST.alt}) as RatedKeyDef));
     }
 
     let result: RatedKeyDef[] = [];
     for (const [key, difficulty] of keySet(keySetName).entries()) {
-        result.push(...templates.map(t => ({...t, char: key, difficulty: t.difficulty! + difficulty})));
+        result.push(...templates.map(t => ({...t, char: key, relativeDifficulty: t.relativeDifficulty! + difficulty})));
     }
 
     // sort by difficulty and keep in original declared order if same difficulty
-    result.sort((l, r) => l.difficulty === r.difficulty
+    result.sort((l, r) => l.relativeDifficulty === r.relativeDifficulty
         ? 0
-        : l.difficulty > r.difficulty
+        : l.relativeDifficulty > r.relativeDifficulty
             ? 1
             : -1);
     

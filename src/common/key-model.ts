@@ -12,6 +12,6 @@ export interface KeyDef {
 }
 
 export interface RatedKeyDef extends KeyDef{
-    difficulty: number,
+    relativeDifficulty: number,
     normDifficulty: Percent,
 }

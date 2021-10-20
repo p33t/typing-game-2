@@ -2,7 +2,7 @@ import {AppCache, AppConfig, Assessment, KeyCapture, KeyEvent} from "./model";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {listKeyDefs, nextKeyPrompt} from "../../common/key-key";
 import {RatedKeyDef} from "../../common/key-model";
-import {AssessmentConst, evaluate, isKeyDefMatch, PERFECT} from "./assessment";
+import {assess, AssessmentConst, calcMovingAverage, isKeyDefMatch, PERFECT} from "./assessment";
 import {Timestamper} from "../../common/timing";
 
 interface MainState {
@@ -15,7 +15,7 @@ interface MainState {
     /** Incorrect keystrokes entered by the user since the last correct keystroke */
     buffer: KeyCapture[],
 
-    /** The current assessment result for user to observe */
+    /** The current assessment result for user to observe. This is a moving average of KeyEvent.assessment values*/
     assessment?: Assessment,
 
     /** Message shown to the user */
@@ -73,10 +73,16 @@ const mainSlice = createSlice({
                 || (mode === "Ignore" && isMatch)
             ;
 
+            const isFirstKeystroke = state.keyHistory.length === 0;
+            const intervalMillis = isFirstKeystroke
+                ? undefined
+                : keyCapture.keyedAt - state.keyHistory[state.keyHistory.length - 1].keyedAt;
+            const assessment = isFirstKeystroke ? undefined : assess(prompt, intervalMillis!, keyCapture);
             if (canConsume) {
                 state.keyHistory.push({
                     ...keyCapture,
-                    prompt
+                    prompt,
+                    assessment,
                 });
                 state.buffer.length = 0;
                 state.keyPrompt.shift();
@@ -85,11 +91,11 @@ const mainSlice = createSlice({
             }
 
             // This likely won't include the last few key strokes but is OK for now
-            // Avoid assessing on first 2 keystrokes because score will be '0'
+            // Avoid assessing on first keystroke because score will be '0'
             const evalIsDue = state.keyHistory.length >= 2 
                 && keyCapture.keyedAt >= (state.assessment?.assessedAt ?? state.keyHistory[0]!.keyedAt) + 1200;
             if (evalIsDue) {
-                state.assessment = evaluate(state.keyHistory);
+                state.assessment = calcMovingAverage(state.keyHistory);
 
                 // only auto adjust after a fresh assessment
                 if (state.config.difficultyAutoAdjust) {

@@ -1,5 +1,5 @@
-import {Assessment, KeyEvent} from "./model";
-import {KeyDef, Percent} from "../../common/key-model";
+import {Assessment, KeyCapture, KeyEvent} from "./model";
+import {KeyDef, Percent, RatedKeyDef} from "../../common/key-model";
 import {Timestamper} from "../../common/timing";
 
 export const PERFECT: Percent = 100;
@@ -8,7 +8,8 @@ export const AssessmentConst = {
 //     // PERFECT_KEY_RATE_MIN: 1, // need at least one key per second as the goal
 //     // PERFECT_KEY_RATE_MAX: 8, // at most 8 key per second as the goal
 //     HISTORY_SIZE: 50, // size of sample for assessment  
-    DURATION_RANGE_FACTOR: 10, // 10 times slower than perfect is 0% (unless limit is activated)
+    MOVING_AVERAGE_WINDOW: 10, // size of moving average window for displaying score
+    INTERVAL_RANGE_FACTOR: 10, // 10 times slower than perfect is 0% (unless limit is activated)
     DIFFICULTY_GAIN_QUOTIENT: 8, // 1/x proportion of the difference will be compensated (default)
     STEADY_ACCURACY: .9 * PERFECT, // the accuracy that is deemed desirable, assuming it can be imperfect
     STEADY_SPEED: .7 * PERFECT, // the speed that is deemed desirable
@@ -23,9 +24,9 @@ export const AssessmentConst = {
 //
 //     HIGH_PROBABILITY: 20,
 // };
-const DURATION_PERFECT = 1000 / AssessmentConst.PERFECT_KEY_RATE_DEFAULT;
-const DURATION_0 = AssessmentConst.DURATION_RANGE_FACTOR * DURATION_PERFECT;
-const DURATION_RANGE = DURATION_0 - DURATION_PERFECT;
+const INTERVAL_PERFECT = 1000 / AssessmentConst.PERFECT_KEY_RATE_DEFAULT;
+const INTERVAL_0 = AssessmentConst.INTERVAL_RANGE_FACTOR * INTERVAL_PERFECT;
+const INTERVAL_RANGE = INTERVAL_0 - INTERVAL_PERFECT;
 
 export function permittedKeys(availableSorted: KeyDef[], difficulty: Percent): KeyDef[] {
 
@@ -36,18 +37,49 @@ export function permittedKeys(availableSorted: KeyDef[], difficulty: Percent): K
     return availableSorted;
 }
 
-export function evaluate(history: KeyEvent[]): Assessment {
-    const difficulty = calcDifficulty(history);
-    const speed = calcSpeed(history);
-    const accuracy = calcAccuracy(history);
-    const cube = speed * accuracy * difficulty;
-    const overall = Math.pow(cube, 1 / 3);
-    
+/** Assess the given key capture/prompt/interval */
+export function assess(prompt: RatedKeyDef, intervalMillis: number, keyCapture: KeyCapture): Assessment {
+    const accuracy = isKeyDefMatch(prompt, keyCapture) ? PERFECT : 0;
+    const difficulty = prompt.normDifficulty;
+    const speed = calcSpeedSingle(intervalMillis);
+    const overall = average([accuracy, difficulty, speed]);
     return {
         assessedAt: Timestamper(),
-        difficulty: Math.round(difficulty),
-        speed: Math.round(speed),
-        accuracy: Math.round(accuracy),
+        speed,
+        accuracy,
+        difficulty,
+        overall,
+    };
+}
+
+export function calcMovingAverage(history: KeyEvent[]): Assessment {
+    let count = 0;
+    let difficulty = 0;
+    let speed = 0;
+    let accuracy = 0;
+    let assessedAt = 0;
+    for (let ix = history.length - 1; ix >= 0; ix--) {
+        const keyEvent = history[ix];
+        if (keyEvent.assessment) {
+            count++;
+            assessedAt = keyEvent.assessment.assessedAt;
+            difficulty += keyEvent.assessment.difficulty;
+            speed += keyEvent.assessment.speed;
+            accuracy += keyEvent.assessment.accuracy;
+            
+            if (count === AssessmentConst.MOVING_AVERAGE_WINDOW) break;
+        }
+    }
+    
+    if (count === 0) throw new Error('Cannot summarize because no assessments');
+    
+    const overall = (speed + accuracy + difficulty) / 3 / count;
+    
+    return {
+        assessedAt,
+        difficulty: Math.round(difficulty / count),
+        speed: Math.round(speed / count),
+        accuracy: Math.round(accuracy / count),
         overall: Math.round(overall)
     };
 }
@@ -64,33 +96,9 @@ function average(values: number[]) {
     return sum / values.length;
 }
 
-export function calcAccuracy(history: KeyEvent[]): Percent {
-    if (history.length === 0) return PERFECT;
-    const hits = history.filter(ke => isKeyDefMatch(ke, ke.prompt)).length;
-    return hits * PERFECT / history.length;
-}
-
-export function calcDifficulty(history: KeyEvent[]): Percent {
-    if (history.length === 0) return 0;
-
-    const normDifficulties = history.map(ke => ke.prompt.normDifficulty!);
-    return average(normDifficulties);
-}
-
-export function calcSpeed(history: KeyEvent[]): Percent {
-    if (history.length <= 1) return 0;
-
-    function calcSpeed1(prevKeyedAt: number, nextKeyedAt: number): number {
-        const duration = nextKeyedAt - prevKeyedAt;
-        let normDuration = (duration - DURATION_PERFECT) * PERFECT / DURATION_RANGE;
-        normDuration = Math.max(0, normDuration);
-        normDuration = Math.min(PERFECT, normDuration);
-        return PERFECT - normDuration;
-    }
-
-    const speeds = history.flatMap((ke, index) =>
-        index === 0
-            ? []
-            : [calcSpeed1(history[index - 1].keyedAt, history[index].keyedAt)]);
-    return average(speeds);
+function calcSpeedSingle(intervalMillis: number) {
+    let normDuration = (intervalMillis - INTERVAL_PERFECT) * PERFECT / INTERVAL_RANGE;
+    normDuration = Math.max(0, normDuration);
+    normDuration = Math.min(PERFECT, normDuration);
+    return PERFECT - normDuration;
 }
