@@ -4,18 +4,21 @@ Adaptive random keyboard typing trainer
 ## Description
 A web app for gradually improving typing skill on unfamiliar keyboards.  
 ![Main Screenshot](docs/screenshot-main.png)
-See also [Documentation](docs/index.md)
+See also [Documentation](docs/index.md) & [Release Notes](release-notes.md)
 
 ## Installation
 ### Online
 Published at https://arketyper.freshcode.biz
 
 ### Deployment
-1. Edit `vit.config.ts` so that __APP_VERSION__ shows up
+1. Edit `vite.config.ts` so that __APP_VERSION__ shows up
 2. `rm -rf dist && npm run build`
 3. Replace relevant content in `../arketyper.freshcode.biz` repo with contents of `dist`
 4. Commit and push the adjacent repo
-5. Update the version number and commit + push this repo
+5. Update release notes
+6. Update the version number
+7. Rollback `vite.config.js`
+8. Commit + push this repo
 
 ### Workstation (for development)
 1. Clone this repo
