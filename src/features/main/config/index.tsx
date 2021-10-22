@@ -94,8 +94,8 @@ export default function MainConfigComponent() {
                     {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
                 </Form.Group>
 
-                <Form.Group inline>
-                    <label>Errors:</label>
+                <Form.Group>
+                    <label>Errors:&nbsp;</label>
                     {ERROR_HANDLING_MODES.map((mode, index) => {
                         return (<span key={mode}>
                             {index > 0 && <>&nbsp;&nbsp;&nbsp;</>}

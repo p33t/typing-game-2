@@ -3,19 +3,23 @@ import 'semantic-ui-css/semantic.min.css'
 import MainPage from './features/main/index'
 import {Grid, Header, Icon, Image, Modal, Segment} from 'semantic-ui-react'
 import React from "react";
+import MainConfig from "./features/main/config";
+import Scoreboard from "./features/main/component/scoreboard";
 
 function App() {
     const [open, setOpen] = React.useState(false);
-    
+
     return (
-        <div className="App">
-            <Grid textAlign='center' style={{height: '100vh'}} verticalAlign='middle'>
-                <Grid.Column style={{maxWidth: 450}}>
-                    <Header as='h2' color='teal' textAlign='center'>
-                        <Image src='/logo.png'/> Arketyper
-                    </Header>
-                    <Segment stacked>
-                        <MainPage/>
+        <div className="App ui container">
+            <Grid centered verticalAlign='middle'>
+                <Grid.Row>
+                    <Grid.Column width={4}/>
+                    <Grid.Column width={8}>
+                        <Header as='h2' color='teal' textAlign='center'>
+                            <Image src='/logo.png'/> Arketyper
+                        </Header>
+                    </Grid.Column>
+                    <Grid.Column width={4}>
                         <div style={{textAlign: 'right'}}>
                             <Modal
                                 closeIcon
@@ -44,8 +48,19 @@ function App() {
                                 </Modal.Content>
                             </Modal>
                         </div>
-                    </Segment>
-                </Grid.Column>
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                    <Grid.Column width={4}>
+                        <MainConfig/>
+                    </Grid.Column>
+                    <Grid.Column width={8}>
+                        <MainPage/>
+                    </Grid.Column>
+                    <Grid.Column width={4}>
+                        <Scoreboard/>
+                    </Grid.Column>
+                </Grid.Row>
             </Grid>
         </div>
     )
