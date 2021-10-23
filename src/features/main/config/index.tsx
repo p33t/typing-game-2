@@ -59,7 +59,7 @@ export default function MainConfigComponent() {
 
     const keyRangeSlider = <input type='range'
                                     style={{width: '100%'}}
-                                    value={config.keyRange}
+                                    value={Math.round(config.keyRange)}
                                     min='0'
                                     max={PERFECT.toString()}
                                     onChange={onDifficultyChange}/>;

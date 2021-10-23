@@ -29,7 +29,7 @@ interface MainState {
 
     /** The last time the difficulty was auto adjusted */
     autoAdjustedAt?: number,
-    
+
     /** Flag indicating user has interacted with the UI */
     touched: boolean,
 }
@@ -92,7 +92,7 @@ const mainSlice = createSlice({
 
             // This likely won't include the last few key strokes but is OK for now
             // Avoid assessing on first keystroke because score will be '0'
-            const evalIsDue = state.keyHistory.length >= 2 
+            const evalIsDue = state.keyHistory.length >= 2
                 && keyCapture.keyedAt >= (state.assessment?.assessedAt ?? state.keyHistory[0]!.keyedAt) + 1200;
             if (evalIsDue) {
                 state.assessment = calcMovingAverage(state.keyHistory);
@@ -121,17 +121,25 @@ const mainSlice = createSlice({
 
 function adjustDifficulty(state: MainState) {
     const assessment = state.assessment!;
-    const desiredAccuracy = state.config.errorHandlingMode !== "Accept" ? PERFECT : AssessmentConst.STEADY_ACCURACY;
-    const desiredCombo = Math.sqrt(desiredAccuracy * AssessmentConst.STEADY_SPEED);
-    const actualCombo = Math.sqrt(assessment.accuracy * assessment.speed);
-    const delta = (desiredCombo - actualCombo) / AssessmentConst.DIFFICULTY_GAIN_QUOTIENT;
-    // want rating to go down if current is < desired and VV.
-    let difficultyTarget = state.config.keyRange - delta;
-    difficultyTarget = Math.max(0, difficultyTarget);
-    difficultyTarget = Math.min(PERFECT, difficultyTarget);
-    difficultyTarget = Math.round(difficultyTarget);
-    console.log(`New difficulty: ${delta < 0 ? '-' : '+'}${Math.abs(delta)} = ${difficultyTarget}`)
-    state.config.keyRange = difficultyTarget;
+    const desiredAccuracy = state.config.errorHandlingMode === "Accept" ? AssessmentConst.STEADY_ACCURACY : PERFECT;
+    const desiredCombo = (desiredAccuracy + AssessmentConst.STEADY_SPEED) / 2;
+    const actualCombo = (assessment.accuracy + assessment.speed) / 2;
+
+    let delta = (actualCombo - desiredCombo) / AssessmentConst.KEY_RANGE_GAIN_QUOTIENT;
+
+    if (delta >= 0) {
+        if (delta < AssessmentConst.KEY_RANGE_DELTA_POSITIVE_MIN)
+            delta = AssessmentConst.KEY_RANGE_DELTA_POSITIVE_MIN;
+    } else {
+        if (-AssessmentConst.KEY_RANGE_DELTA_NEGATIVE_MIN < delta)
+            delta = -AssessmentConst.KEY_RANGE_DELTA_NEGATIVE_MIN;
+    }
+
+    let keyRangeTarget = state.config.keyRange + delta;
+    keyRangeTarget = Math.max(0, keyRangeTarget);
+    keyRangeTarget = Math.min(PERFECT, keyRangeTarget);
+    console.log(`New difficulty: ${delta < 0 ? '-' : '+'}${Math.abs(delta)} = ${keyRangeTarget}`)
+    state.config.keyRange = keyRangeTarget;
     state.autoAdjustedAt = Timestamper();
 }
 
@@ -167,7 +175,7 @@ function manageKeys(state: MainState) {
     // keep only those within difficulty range
     maxIndex = Math.round((maxIndex - 1) * state.config.keyRange / PERFECT) + 1; // min 2 chars
     const available = state.cache!.availableKeys.slice(0, maxIndex + 1);
-    while (state.keyPrompt.length < 6) {
+    while (state.keyPrompt.length < 5) {
         const next = nextKeyPrompt(available, state.keyPrompt);
         state.keyPrompt.push(next);
     }

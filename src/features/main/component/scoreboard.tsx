@@ -28,10 +28,20 @@ export default function ScoreboardComponent() {
             </td>
             <td>
                 <p>
-                    Speed: {assessment?.speed}<br/>
-                    Difficulty: {assessment?.difficulty}<br/>
-                    Accuracy: {assessment?.accuracy}<br/>
-                    Overall: {assessment?.overall}<br/>
+                    Speed:<br/>
+                    Difficulty:<br/>
+                    Accuracy:<br/>
+                    <hr/>
+                    Overall:<br/>
+                </p>
+            </td>
+            <td>
+                <p style={{textAlign: 'right'}}>
+                    {Math.round(assessment?.speed ?? 0)}<br/>
+                    {Math.round(assessment?.difficulty ?? 0)}<br/>
+                    {Math.round(assessment?.accuracy ?? 0)}<br/>
+                    <br/>
+                    {Math.round(assessment?.overall ?? 0)}<br/>
                 </p>
             </td>
         </tr>

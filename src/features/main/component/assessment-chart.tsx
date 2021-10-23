@@ -38,6 +38,7 @@ export default function AssessmentChartComponent() {
             },
             vAxis: {
                 title: 'Cumulative Score',
+                maxValue: 10000,
                 minValue: 0,
             },
         }}

@@ -8,9 +8,11 @@ export const AssessmentConst = {
 //     // PERFECT_KEY_RATE_MIN: 1, // need at least one key per second as the goal
 //     // PERFECT_KEY_RATE_MAX: 8, // at most 8 key per second as the goal
 //     HISTORY_SIZE: 50, // size of sample for assessment  
-    MOVING_AVERAGE_WINDOW: 10, // size of moving average window for displaying score
+    MOVING_AVERAGE_WINDOW: 4, // size of moving average window for displaying score
     INTERVAL_RANGE_FACTOR: 10, // 10 times slower than perfect is 0% (unless limit is activated)
-    DIFFICULTY_GAIN_QUOTIENT: 8, // 1/x proportion of the difference will be compensated (default)
+    KEY_RANGE_GAIN_QUOTIENT: 6, // 1/x proportion of the difference will be compensated (default)
+    KEY_RANGE_DELTA_POSITIVE_MIN: 2, // will vary by at least this percent for every positive adjustment
+    KEY_RANGE_DELTA_NEGATIVE_MIN: 1, // will vary by at least this percent for every negative adjustment
     STEADY_ACCURACY: .9 * PERFECT, // the accuracy that is deemed desirable, assuming it can be imperfect
     STEADY_SPEED: .7 * PERFECT, // the speed that is deemed desirable
 }
@@ -73,14 +75,14 @@ export function calcMovingAverage(history: KeyEvent[]): Assessment {
     
     if (count === 0) throw new Error('Cannot summarize because no assessments');
     
-    const overall = (speed + accuracy + difficulty) / 3 / count;
+    const overall = (speed + accuracy + difficulty) / 3;
     
     return {
         assessedAt,
-        difficulty: Math.round(difficulty / count),
-        speed: Math.round(speed / count),
-        accuracy: Math.round(accuracy / count),
-        overall: Math.round(overall)
+        difficulty: difficulty / count,
+        speed: speed / count,
+        accuracy: accuracy / count,
+        overall: overall / count,
     };
 }
 
