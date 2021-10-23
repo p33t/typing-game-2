@@ -116,6 +116,12 @@ const mainSlice = createSlice({
             state.config = action.payload;
             manageKeys(state);
         },
+        resetChallenge(state) {
+            state.keyHistory.length = 0;
+            state.keyPrompt.length = 0;
+            state.buffer.length = 0;
+            manageKeys(state);
+        },
     },
 });
 
@@ -181,5 +187,5 @@ function manageKeys(state: MainState) {
     }
 }
 
-export const {keyPressed, backspaced, configChanged} = mainSlice.actions;
+export const {keyPressed, backspaced, configChanged, resetChallenge} = mainSlice.actions;
 export default mainSlice.reducer;

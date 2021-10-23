@@ -1,10 +1,13 @@
 import {Chart} from "react-google-charts";
 import {useAppSelector} from "../../../app/hooks";
+import {useMemo} from "react";
 
 export default function ScoreboardComponent() {
 
     const assessment = useAppSelector((state) => state.main.assessment);
 
+    const roundOverall = useMemo(() => Math.round(assessment?.overall ?? 0), [assessment]);
+    
     return (<table>
         <tbody>
         <tr>
@@ -15,7 +18,7 @@ export default function ScoreboardComponent() {
                     loader={<div>Loading Chart</div>}
                     data={[
                         ['Label', 'Value'],
-                        ['Overall', assessment?.overall ?? 0],
+                        ['Overall', roundOverall],
                     ]}
                     options={{
                         redFrom: 90,
@@ -26,7 +29,7 @@ export default function ScoreboardComponent() {
                     }}
                 />
             </td>
-            <td>
+            <td style={{textAlign: 'right'}}>
                 <p>
                     Speed:<br/>
                     Difficulty:<br/>
@@ -41,7 +44,7 @@ export default function ScoreboardComponent() {
                     {Math.round(assessment?.difficulty ?? 0)}<br/>
                     {Math.round(assessment?.accuracy ?? 0)}<br/>
                     <br/>
-                    {Math.round(assessment?.overall ?? 0)}<br/>
+                    <strong>{roundOverall}</strong>
                 </p>
             </td>
         </tr>
