@@ -20,18 +20,23 @@ function calcKeySet(name: KeySetName, difficultiesObj: any): [KeySetName, KeySet
 const KEY_SETS: Map<KeySetName, KeySet> = new Map<KeySetName, KeySet>(
     [
         calcKeySet('US Home Keys', {
-            ['jfkd']: 15,
+            ['jf']: 15,
+            ['kd']: 16,
             ['ls;a']: 18,
         }),
         calcKeySet('US Letters', {
-            ['jfkdlsa']: 15,
+            ['jf']: 15,
+            ['kd']: 16,
+            ['lsa']: 18,
             ['urieow']: 23,
             ['hgmcxnv']: 25,
             ['zt']: 26,
             ['bqpy']: 35,
         }),
         calcKeySet('US Letters, Symbols', {
-            ['jfkdlsa;']: 15,
+            ['jf']: 15,
+            ['kd']: 16,
+            ['lsa;']: 18,
             ['urieow']: 23,
             ['ghmc,xnv']: 25,
             ['.z/t']: 26,
@@ -99,6 +104,7 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
             ? 1
             : -1);
     
+    // TODO: Norm difficulty should be based on relative difficulty (not position)
     const increment = PERFECT / (result.length - 1);
     result.forEach((kd, index) => kd.normDifficulty = index * increment);
     

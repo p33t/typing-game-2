@@ -44,8 +44,8 @@ const initialState: MainState = {
         shiftEnabled: true,
         controlEnabled: false,
         altEnabled: false,
-        difficultyAutoAdjust: true,
-        difficultyTarget: PERFECT / 10, // quite low
+        keyRangeAutoAdjust: true,
+        keyRange: PERFECT / 10, // quite low
         errorHandlingMode: "Ignore",
     },
 }
@@ -98,7 +98,7 @@ const mainSlice = createSlice({
                 state.assessment = calcMovingAverage(state.keyHistory);
 
                 // only auto adjust after a fresh assessment
-                if (state.config.difficultyAutoAdjust) {
+                if (state.config.keyRangeAutoAdjust) {
                     const autoAdjustIsDue = keyCapture.keyedAt >= (state.autoAdjustedAt ?? 0) + 4000;
                     if (autoAdjustIsDue) {
                         adjustDifficulty(state);
@@ -126,12 +126,12 @@ function adjustDifficulty(state: MainState) {
     const actualCombo = Math.sqrt(assessment.accuracy * assessment.speed);
     const delta = (desiredCombo - actualCombo) / AssessmentConst.DIFFICULTY_GAIN_QUOTIENT;
     // want rating to go down if current is < desired and VV.
-    let difficultyTarget = state.config.difficultyTarget - delta;
+    let difficultyTarget = state.config.keyRange - delta;
     difficultyTarget = Math.max(0, difficultyTarget);
     difficultyTarget = Math.min(PERFECT, difficultyTarget);
     difficultyTarget = Math.round(difficultyTarget);
     console.log(`New difficulty: ${delta < 0 ? '-' : '+'}${Math.abs(delta)} = ${difficultyTarget}`)
-    state.config.difficultyTarget = difficultyTarget;
+    state.config.keyRange = difficultyTarget;
     state.autoAdjustedAt = Timestamper();
 }
 
@@ -165,7 +165,7 @@ function manageKeys(state: MainState) {
 
     let maxIndex = state.cache!.availableKeys.length - 1;
     // keep only those within difficulty range
-    maxIndex = Math.round((maxIndex - 1) * state.config.difficultyTarget / PERFECT) + 1; // min 2 chars
+    maxIndex = Math.round((maxIndex - 1) * state.config.keyRange / PERFECT) + 1; // min 2 chars
     const available = state.cache!.availableKeys.slice(0, maxIndex + 1);
     while (state.keyPrompt.length < 6) {
         const next = nextKeyPrompt(available, state.keyPrompt);

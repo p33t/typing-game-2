@@ -30,8 +30,8 @@ export type AppConfig = {
     shiftEnabled: boolean;
     altEnabled: boolean;
     controlEnabled: boolean;
-    difficultyAutoAdjust: boolean;
-    difficultyTarget: Percent,
+    keyRangeAutoAdjust: boolean;
+    keyRange: Percent,
     errorHandlingMode: ErrorHandlingMode,
 };
 

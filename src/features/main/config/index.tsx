@@ -51,15 +51,15 @@ export default function MainConfigComponent() {
     const onDifficultyChange: ChangeEventHandler<HTMLInputElement> = useCallback((evt) => {
         const newConfig = {
             ...config,
-            difficultyTarget: Number(evt.target.value),
+            keyRange: Number(evt.target.value),
         } as AppConfig;
         dispatch(configChanged(newConfig));
         evt.preventDefault();
     }, [config]);
 
-    const difficultySlider = <input type='range'
+    const keyRangeSlider = <input type='range'
                                     style={{width: '100%'}}
-                                    value={config.difficultyTarget}
+                                    value={config.keyRange}
                                     min='0'
                                     max={PERFECT.toString()}
                                     onChange={onDifficultyChange}/>;
@@ -112,19 +112,19 @@ export default function MainConfigComponent() {
                 </Form.Field>
 
                 <Form.Group inline>
-                    <label>Target Difficulty:</label>
+                    <label>Key Range:</label>
                     <Form.Radio
                         inline
-                        value='difficultyAutoAdjust'
+                        value='keyRangeAutoAdjust'
                         label='Auto'
                         toggle
-                        checked={config.difficultyAutoAdjust}
+                        checked={config.keyRangeAutoAdjust}
                         onChange={onToggle}
                     />
                 </Form.Group>
-                <Popup content={config.difficultyTarget.toString()}
+                <Popup content={`${config.keyRange}%`}
                        position='right center'
-                       trigger={difficultySlider}/>
+                       trigger={keyRangeSlider}/>
             </Form>
         </div>
     );
