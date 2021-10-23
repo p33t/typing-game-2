@@ -5,6 +5,7 @@ import {Grid, Header, Icon, Image, Modal, Segment} from 'semantic-ui-react'
 import React from "react";
 import MainConfig from "./features/main/config";
 import Scoreboard from "./features/main/component/scoreboard";
+import AssessmentChart from './features/main/component/assessment-chart';
 
 function App() {
     const [open, setOpen] = React.useState(false);
@@ -59,6 +60,11 @@ function App() {
                     </Grid.Column>
                     <Grid.Column width={4}>
                         <Scoreboard/>
+                    </Grid.Column>
+                </Grid.Row>
+                <Grid.Row>
+                    <Grid.Column>
+                        <AssessmentChart/>
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

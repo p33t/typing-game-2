@@ -137,7 +137,7 @@ function adjustDifficulty(state: MainState) {
 
 function manageKeys(state: MainState) {
     let historyLength = state.keyHistory.length;
-    while (historyLength > 10) {
+    while (historyLength > 100) {
         state.keyHistory.shift();
         historyLength--;
     }
