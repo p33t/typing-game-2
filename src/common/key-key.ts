@@ -104,9 +104,9 @@ export function listKeyDefs(keySetName: KeySetName, shiftEnabled: boolean, contr
             ? 1
             : -1);
     
-    // TODO: Norm difficulty should be based on relative difficulty (not position)
-    const increment = PERFECT / (result.length - 1);
-    result.forEach((kd, index) => kd.normDifficulty = index * increment);
+    const maxDifficulty = result[result.length - 1].relativeDifficulty;
+    result.forEach((kd, index) =>
+        kd.normDifficulty = kd.relativeDifficulty * PERFECT / maxDifficulty);
     
     return result;
 }
