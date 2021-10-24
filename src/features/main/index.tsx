@@ -3,10 +3,8 @@ import {backspaced, keyPressed} from "./slice";
 import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
-import MainConfig from './config/index';
-import React, {useCallback, useMemo, useState} from "react";
-import {Button, CardHeader, Form, Grid, Popup, Radio, Rail, Segment} from "semantic-ui-react";
-import Scoreboard from "./component/scoreboard";
+import React, {useCallback, useMemo} from "react";
+import {Popup} from "semantic-ui-react";
 import {isKeyDefMatch} from "./assessment";
 
 export default function MainPage() {
@@ -33,8 +31,6 @@ export default function MainPage() {
         return isKeyDefMatch(ke, ke.prompt);
     }, [main.keyHistory]);
 
-    const [typeChallengeVisible, setTypeChallengeVisible] = useState(false);
-
     return (<table className={'main-table'}>
         <tbody>
         <tr>
@@ -47,9 +43,7 @@ export default function MainPage() {
         </tr>
         <tr>
             <td align="right" width='1*'>
-                <Popup content='Type the letters above in here'
-                       position='left center'
-                       trigger={<KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>}/>
+                <KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>
             </td>
             <td>
                 <Popup
@@ -63,21 +57,6 @@ export default function MainPage() {
                         selectAll={main.config.errorHandlingMode === "Ignore"}/>}/>
             </td>
         </tr>
-        {/*<tr>*/}
-        {/*    <td colSpan={2}>*/}
-        {/*        <Segment stacked>*/}
-        {/*            <Form.Radio*/}
-        {/*                toggle*/}
-        {/*                checked={typeChallengeVisible}*/}
-        {/*                onChange={evt => {*/}
-        {/*                    setTypeChallengeVisible(!typeChallengeVisible);*/}
-        {/*                    evt.preventDefault();*/}
-        {/*                }}*/}
-        {/*                label={<label>Typing Challenge</label>}*/}
-        {/*            />*/}
-        {/*        </Segment>*/}
-        {/*    </td>*/}
-        {/*</tr>*/}
         </tbody>
     </table>);
 }
