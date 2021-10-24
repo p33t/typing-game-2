@@ -4,7 +4,7 @@ import {KeyCapture} from "./model";
 import KeyDefs from "./component/key-defs";
 import CaptureKey from "./component/capture-key";
 import React, {useCallback, useMemo} from "react";
-import {Popup} from "semantic-ui-react";
+import {Grid, Popup} from "semantic-ui-react";
 import {isKeyDefMatch} from "./assessment";
 
 export default function MainPage() {
@@ -31,32 +31,26 @@ export default function MainPage() {
         return isKeyDefMatch(ke, ke.prompt);
     }, [main.keyHistory]);
 
-    return (<table className={'main-table'}>
-        <tbody>
-        <tr>
-            <td align="right" width='1*'>
+    return (<Grid>
+        <Grid.Column width={8} id='main-left-col'>
+            <div style={{textAlign: 'right'}}>
                 <KeyDefs keyDefs={history.map(ke => ke.prompt)}/>
-            </td>
-            <td align="left" className="borders">
-                <KeyDefs keyDefs={main.keyPrompt}/>
-            </td>
-        </tr>
-        <tr>
-            <td align="right" width='1*'>
                 <KeyDefs keyDefs={history} isCorrectFn={isCorrect}/>
-            </td>
-            <td>
-                <Popup
-                    inverted
-                    content='Type the letters above in here'
-                    position='left center'
-                    open={main.touched === false}
-                    trigger={<CaptureKey
-                        onCapture={onKeyCapture}
-                        value={main.buffer}
-                        selectAll={main.config.errorHandlingMode === "Ignore"}/>}/>
-            </td>
-        </tr>
-        </tbody>
-    </table>);
+            </div>
+        </Grid.Column>
+        <Grid.Column width={6} id='main-right-col'>
+            <div className='borders'>
+                <KeyDefs keyDefs={main.keyPrompt}/>
+            </div>
+            <Popup
+                inverted
+                content='Type the letters above in here'
+                position='left center'
+                open={main.touched === false}
+                trigger={<CaptureKey
+                    onCapture={onKeyCapture}
+                    value={main.buffer}
+                    selectAll={main.config.errorHandlingMode === "Ignore"}/>}/>
+        </Grid.Column>
+    </Grid>);
 }

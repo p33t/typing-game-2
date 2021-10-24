@@ -94,21 +94,19 @@ export default function MainConfigComponent() {
                     {/* NOTE: Control modifier is too dangerous ATM.  Ctrl-Q closes browser, Ctrl-N opens new window etc. */}
                 </Form.Group>
 
-                <Form.Field>
+                <Form.Field inline>
                     <label>Errors:&nbsp;</label>
-                    <div>
-                        {ERROR_HANDLING_MODES.map((mode, index) => {
-                            return (<span key={mode}>
-                            <Radio
-                                key={mode}
-                                label={mode}
-                                value={mode}
-                                checked={config.errorHandlingMode === mode}
-                                onChange={onToggleErrorMode}
-                            />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            </span>);
-                        })}
-                    </div>
+                    {ERROR_HANDLING_MODES.map((mode, index) => {
+                        return (<span key={mode}>
+                        <Radio
+                            key={mode}
+                            label={mode}
+                            value={mode}
+                            checked={config.errorHandlingMode === mode}
+                            onChange={onToggleErrorMode}
+                        />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </span>);
+                    })}
                 </Form.Field>
 
                 <Form.Group inline>

@@ -32,6 +32,9 @@ interface MainState {
 
     /** Flag indicating user has interacted with the UI */
     touched: boolean,
+    
+    /** Is key challenge showing */
+    keyChallengeEnabled: boolean,
 }
 
 const initialState: MainState = {
@@ -39,6 +42,7 @@ const initialState: MainState = {
     keyHistory: [],
     buffer: [],
     touched: false,
+    keyChallengeEnabled: false,
     config: {
         keySetName: "US Letters",
         shiftEnabled: true,
@@ -122,6 +126,9 @@ const mainSlice = createSlice({
             state.buffer.length = 0;
             manageKeys(state);
         },
+        toggleKeyChallengeEnabled(state) {
+            state.keyChallengeEnabled = !state.keyChallengeEnabled;
+        }
     },
 });
 
@@ -187,5 +194,5 @@ function manageKeys(state: MainState) {
     }
 }
 
-export const {keyPressed, backspaced, configChanged, resetChallenge} = mainSlice.actions;
+export const {keyPressed, backspaced, configChanged, resetChallenge, toggleKeyChallengeEnabled} = mainSlice.actions;
 export default mainSlice.reducer;
