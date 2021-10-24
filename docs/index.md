@@ -20,12 +20,15 @@ Arketyper is web application for gradually improving typing skill on unfamiliar 
 * Accept - Incorrect keystrokes are accepted and will be reflected in your 'accuracy' score
 * Buffer - Incorrect keystrokes must be backspaced before proceeding. This is the most realistic.
 
-### Target Difficulty  
-Limiting the difficulty will allow you to **focus on a smaller, easier subset of keys to practice**.  
-Allow automatic difficulty adjustment or select your desired difficulty (and turn off 'Auto')
+### Key Range
+Limiting the key range will allow you to **focus on a smaller, easier subset of keys to practice**.  
+Allow automatic range adjustment or select your desired range (and turn off 'Auto')
 
 ## Scoring
 * Speed: Is a measure of interval between 'accepted' keystrokes
 * Difficulty: Is a measure of the how easy or hard a key is to press. E.g. Home keys are easy.
 * Accuracy: Is a measure of the number of mistakes made. This matters only for 'Accept' error handling.
 * Overall: Is a combination of speed, difficulty and accuracy
+
+## 100 Key Challenge
+Use this feature to do assessment runs of 100 keystrokes at a time.

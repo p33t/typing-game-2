@@ -3,6 +3,8 @@
 ## 1.0.0  
 
 ### Beta
+- Add '100 Key Challenge'
+- Rename 'target difficulty' to 'key range'
 - Rework scoring calculation
 - Include version number in 'about' popup
 
